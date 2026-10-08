@@ -1,0 +1,13 @@
+Work Item ID,Work Type,Summary,Description,Priority
+1,Story,User Registration and Input Validation,"As a new reader, I want to securely register with unique username and email so that my account credentials and personal data are protected.",High
+2,Story,Secure Authentication and Session Invalidation,"As a registered user, I want to authenticate using bcrypt-hashed credentials and terminate sessions cleanly on logout so that unauthorized sessions cannot be replayed.",High
+3,Story,Book Catalog Parameterized Search,"As a reader, I want to search books by title keyword, author, and genre so that I can discover books without SQL injection risk.",High
+4,Story,Book Details and Dynamic Rating Aggregation,"As a reader, I want to view book details with calculated average star ratings and community review counts so that I can evaluate reading choices.",Medium
+5,Story,Submit Book Rating and Review,"As a reader, I want to submit a 1 to 5 star rating and review body with unique per-user constraint so that I can share feedback.",High
+6,Story,Edit and Delete Own Reviews (IDOR Prevention),"As a review author, I want to edit or delete my own review while preventing any other user from modifying or removing it via IDOR attacks.",Highest
+7,Story,Private Reading List Shelf Management,"As a reader, I want to maintain a private shelf with statuses (want-to-read, reading, finished) isolated strictly to my account.",Medium
+8,Story,Administrator Catalog Management (RBAC),"As an administrator, I want to add, edit, and delete books in the catalog protected by server-side @admin_required authorization.",High
+9,Story,Administrator Review Moderation,"As an administrator, I want to hide or restore inappropriate reviews with mandatory reason logging so that community safety is preserved.",High
+10,Story,Security Audit Logging with Secret Scrubbing,"As a security auditor, I want all sensitive authentication and moderation events logged immutably with credentials scrubbed.",High
+11,Story,Hardened Containerization with Health Probes,"As a DevSecOps engineer, I want the platform packaged in a non-root multi-stage Docker container with /health liveness probes.",Medium
+12,Story,Automated CI/CD Pipeline and SAST Scans,"As a DevSecOps engineer, I want automated unit tests and Bandit SAST security scans running on every commit.",High

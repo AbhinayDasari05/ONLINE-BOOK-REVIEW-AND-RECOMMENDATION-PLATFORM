@@ -7,7 +7,7 @@ services:
       dockerfile: docker/Dockerfile
     container_name: secure-book-review-platform
     ports:
-      - "5000:5000"
+      - "5050:5000"
     environment:
       - FLASK_ENV=production
       - SECRET_KEY=demo-docker-compose-secret-key-change-in-prod-xyz
