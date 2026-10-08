@@ -1,13 +1,120 @@
-Work Item ID,Work Type,Summary,Description,Priority
-1,Story,User Registration and Input Validation,"As a new reader, I want to securely register with unique username and email so that my account credentials and personal data are protected.",High
-2,Story,Secure Authentication and Session Invalidation,"As a registered user, I want to authenticate using bcrypt-hashed credentials and terminate sessions cleanly on logout so that unauthorized sessions cannot be replayed.",High
-3,Story,Book Catalog Parameterized Search,"As a reader, I want to search books by title keyword, author, and genre so that I can discover books without SQL injection risk.",High
-4,Story,Book Details and Dynamic Rating Aggregation,"As a reader, I want to view book details with calculated average star ratings and community review counts so that I can evaluate reading choices.",Medium
-5,Story,Submit Book Rating and Review,"As a reader, I want to submit a 1 to 5 star rating and review body with unique per-user constraint so that I can share feedback.",High
-6,Story,Edit and Delete Own Reviews (IDOR Prevention),"As a review author, I want to edit or delete my own review while preventing any other user from modifying or removing it via IDOR attacks.",Highest
-7,Story,Private Reading List Shelf Management,"As a reader, I want to maintain a private shelf with statuses (want-to-read, reading, finished) isolated strictly to my account.",Medium
-8,Story,Administrator Catalog Management (RBAC),"As an administrator, I want to add, edit, and delete books in the catalog protected by server-side @admin_required authorization.",High
-9,Story,Administrator Review Moderation,"As an administrator, I want to hide or restore inappropriate reviews with mandatory reason logging so that community safety is preserved.",High
-10,Story,Security Audit Logging with Secret Scrubbing,"As a security auditor, I want all sensitive authentication and moderation events logged immutably with credentials scrubbed.",High
-11,Story,Hardened Containerization with Health Probes,"As a DevSecOps engineer, I want the platform packaged in a non-root multi-stage Docker container with /health liveness probes.",Medium
-12,Story,Automated CI/CD Pipeline and SAST Scans,"As a DevSecOps engineer, I want automated unit tests and Bandit SAST security scans running on every commit.",High
+Issue Type,Issue key,Summary,Description,Priority,Status,Story Points,Epic Link,Sprint
+Story,OBRRP-5,Registration,"As a new visitor, I want to create a secure personal account with unique credentials, so that I can access personalized book reviews and shelves.
+
+Acceptance Criteria:
+- Required registration fields are validated
+- Passwords are securely hashed with bcrypt (work factor=12)
+- Duplicate username/email is rejected
+- Invalid input is rejected
+- Successful registration creates a USER account
+- User cannot self-register as ADMIN",High,Done,3,EPIC-01,Sprint 1 — Core Platform
+Story,OBRRP-6,Secure Login,"As a registered user, I want to authenticate with my username/email and password, so that I can securely access my private session.
+
+Acceptance Criteria:
+- Valid credentials authenticate successfully
+- Invalid credentials are rejected without user enumeration
+- Passwords are never stored or displayed in plaintext
+- Secure server-side session is created with HttpOnly/SameSite
+- Authentication failures do not expose sensitive information",High,Done,5,EPIC-01,Sprint 1 — Core Platform
+Story,OBRRP-7,Secure Logout & Sessions,"As an authenticated user, I want to terminate my session on logout, so that my account cannot be accessed from a shared or public device.
+
+Acceptance Criteria:
+- Logout invalidates the session completely
+- Protected pages cannot be accessed after logout
+- Session handling follows secure configuration",Medium,Done,3,EPIC-01,Sprint 1 — Core Platform
+Story,OBRRP-8,Search Books,"As a reader, I want to search and filter books by keyword, author, and genre, so that I can discover books matching my interests.
+
+Acceptance Criteria:
+- User can search by title
+- User can search by author
+- User can search by genre
+- Search input is validated
+- Database queries are safely parameterized/ORM based",High,Done,5,EPIC-02,Sprint 1 — Core Platform
+Story,OBRRP-9,View Book Details,"As a reader, I want to view full metadata, synopsis, and community reviews for a book, so that I can evaluate whether to read it.
+
+Acceptance Criteria:
+- Book details are displayed
+- Ratings are displayed
+- Reviews are displayed
+- Average rating is calculated correctly
+- Nonexistent books return safe handling",Medium,Done,3,EPIC-02,Sprint 1 — Core Platform
+Story,OBRRP-10,Rate & Review Books,"As an authenticated reader, I want to assign a 1-5 star rating and post a written review, so that I can contribute to the community catalog.
+
+Acceptance Criteria:
+- Rating is restricted to 1-5
+- User can submit a review
+- Review input is validated (5-2000 chars)
+- Review belongs to correct user and book
+- Invalid/malicious input is rejected safely",High,Done,8,EPIC-02,Sprint 1 — Core Platform
+Story,OBRRP-11,Edit/Delete Own Reviews,"As a review author, I want to update or delete my existing review, so that I can manage my published opinions.
+
+Acceptance Criteria:
+- User can edit their own review
+- User can delete their own review
+- User cannot edit another user's review
+- User cannot delete another user's review
+- Unauthorized attempts do not modify the database",High,Done,5,EPIC-02,Sprint 1 — Core Platform
+Story,OBRRP-12,Reading List,"As a reader, I want to maintain a private reading shelf (want-to-read, reading, finished), so that I can track my personal reading journey.
+
+Acceptance Criteria:
+- User can add a book
+- User can update reading status
+- User can remove a book
+- Reading list is associated with the authenticated user
+- Other users cannot modify the list",Medium,Done,5,EPIC-02,Sprint 1 — Core Platform
+Story,OBRRP-13,Admin Book Management,"As an administrator, I want to create, update, and delete books in the catalog, so that the platform inventory stays accurate and up-to-date.
+
+Acceptance Criteria:
+- Admin can create books
+- Admin can edit books
+- Admin can delete books
+- Normal users cannot perform admin book operations
+- Unauthorized access is denied with 403 Forbidden",High,Done,5,EPIC-03,Sprint 2 — Security & DevSecOps
+Story,OBRRP-14,Review Moderation,"As an administrator, I want to hide or restore abusive reviews with a mandatory reason, so that community safety and decency standards are maintained.
+
+Acceptance Criteria:
+- Admin can view reviews requiring moderation
+- Admin can remove/hide inappropriate reviews
+- Moderation action is recorded with mandatory reason
+- Normal users cannot perform moderation",High,Done,5,EPIC-03,Sprint 2 — Security & DevSecOps
+Story,OBRRP-15,Secure Authorization & IDOR Protection,"As a security engineer, I want object-level authorization enforced on all mutable resources, so that horizontal privilege escalation (IDOR) attacks are completely blocked.
+
+Acceptance Criteria:
+- User A can modify only their own resources
+- User B cannot modify User A's resources
+- Unauthorized requests return appropriate denial
+- Database remains unchanged after unauthorized attempts
+- Authorization is enforced server-side",Highest,Done,8,EPIC-03,Sprint 2 — Security & DevSecOps
+Story,OBRRP-16,Audit Logging,"As a security auditor, I want a tamper-evident audit log of all security and administrative events, so that system activities are traceable and non-repudiable.
+
+Acceptance Criteria:
+- Security-sensitive actions are logged
+- Admin actions are logged
+- Authorization failures are logged where appropriate
+- Logs do not contain passwords/secrets",High,Done,3,EPIC-03,Sprint 2 — Security & DevSecOps
+Story,OBRRP-17,Security & Authorization Testing,"As a QA/Security tester, I want automated test suites covering unit, integration, authorization, and fuzzing vectors, so that vulnerabilities are detected before release.
+
+Acceptance Criteria:
+- Authentication tests exist
+- Authorization tests exist
+- IDOR tests exist
+- Validation/security tests exist
+- Automated tests produce real results
+- Security scans are executed when the tools are available",High,Done,5,EPIC-04,Sprint 2 — Security & DevSecOps
+Story,OBRRP-18,CI/CD Pipeline,"As a DevSecOps engineer, I want a GitHub Actions pipeline running tests and SAST scans on every push, so that code quality and security policies are automatically enforced.
+
+Acceptance Criteria:
+- Pipeline installs dependencies
+- Pipeline runs tests
+- Pipeline runs available security checks
+- Pipeline reports failures
+- Pipeline uses minimal permissions where applicable",High,Done,5,EPIC-04,Sprint 2 — Security & DevSecOps
+Story,OBRRP-19,Docker & Local Kubernetes Deployment,"As a DevOps engineer, I want the platform containerized with non-root security and equipped with Kubernetes manifests, so that the application is production-deployable.
+
+Acceptance Criteria:
+- Dockerfile exists and builds cleanly
+- Image can be built where Docker is available
+- Application does not run as root (UID 10001:10001)
+- Secrets are not baked into image
+- Health check exists (/health returns healthy)
+- Kubernetes manifests exist with resource limits/probes",High,Done,8,EPIC-04,Sprint 2 — Security & DevSecOps
