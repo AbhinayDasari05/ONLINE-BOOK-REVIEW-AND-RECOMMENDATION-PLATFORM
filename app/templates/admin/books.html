@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Book Catalog Management - BookShield{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <div>
+    <h2 style="color: var(--primary);">Administrator: Book Catalog Management</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem;">Manage books in the public catalog (Create, Update, Delete) — Role Enforced (REQ-10).</p>
+  </div>
+  <button onclick="document.getElementById('new-book-card').style.display='block'" class="btn btn-primary">
+    + Add New Book
+  </button>
+</div>
+
+<!-- ADD NEW BOOK FORM -->
+<div id="new-book-card" class="card" style="display: none; border-left: 4px solid var(--primary); margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h3>Add New Book to Catalog</h3>
+    <button onclick="document.getElementById('new-book-card').style.display='none'" style="background:none; border:none; font-size: 1.25rem; cursor:pointer;">&times;</button>
+  </div>
+
+  <form action="{{ url_for('admin.add_book') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label for="title">Book Title</label>
+        <input type="text" id="title" name="title" class="form-control" required maxlength="200" placeholder="e.g. The Pragmatic Programmer">
+      </div>
+      <div class="form-group">
+        <label for="author">Author</label>
+        <input type="text" id="author" name="author" class="form-control" required maxlength="150" placeholder="e.g. Andy Hunt & Dave Thomas">
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label for="genre">Genre</label>
+        <input type="text" id="genre" name="genre" class="form-control" required maxlength="80" placeholder="e.g. Software Engineering">
+      </div>
+      <div class="form-group">
+        <label for="isbn">ISBN</label>
+        <input type="text" id="isbn" name="isbn" class="form-control" required maxlength="20" placeholder="e.g. 978-0135957059">
+      </div>
+      <div class="form-group">
+        <label for="publication_year">Publication Year</label>
+        <input type="number" id="publication_year" name="publication_year" class="form-control" required min="1000" max="2100" value="2024">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Book Description / Synopsis</label>
+      <textarea id="description" name="description" class="form-control" rows="3" required placeholder="Detailed book synopsis..."></textarea>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="submit" class="btn btn-primary">Save Book to Database</button>
+      <button type="button" onclick="document.getElementById('new-book-card').style.display='none'" class="btn btn-secondary">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- CATALOG TABLE -->
+<div class="card">
+  <h3>Existing Catalog Items ({{ books|length }})</h3>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genre</th>
+        <th>ISBN</th>
+        <th>Year</th>
+        <th>Rating</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in books %}
+        <tr>
+          <td>{{ b.id }}</td>
+          <td><strong><a href="{{ url_for('catalog.detail', book_id=b.id) }}" style="color: var(--primary);">{{ b.title }}</a></strong></td>
+          <td>{{ b.author }}</td>
+          <td>{{ b.genre }}</td>
+          <td><code>{{ b.isbn }}</code></td>
+          <td>{{ b.publication_year }}</td>
+          <td>★ {{ b.average_rating }} ({{ b.review_count }})</td>
+          <td>
+            <div style="display: flex; gap: 0.35rem;">
+              <button onclick="toggleEdit({{ b.id }})" class="btn btn-secondary btn-sm">Edit</button>
+              <form action="{{ url_for('admin.delete_book', book_id=b.id) }}" method="POST" onsubmit="return confirm('Delete book \'{{ b.title }}\' and all associated reviews?');" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+
+        <!-- INLINE EDIT ROW -->
+        <tr id="edit-row-{{ b.id }}" style="display: none; background: #f8fafc;">
+          <td colspan="8" style="padding: 1.25rem;">
+            <form action="{{ url_for('admin.edit_book', book_id=b.id) }}" method="POST">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div>
+                  <label style="font-size: 0.75rem; font-weight:600;">Title</label>
+                  <input type="text" name="title" class="form-control" value="{{ b.title }}" required>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; font-weight:600;">Author</label>
+                  <input type="text" name="author" class="form-control" value="{{ b.author }}" required>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div>
+                  <label style="font-size: 0.75rem; font-weight:600;">Genre</label>
+                  <input type="text" name="genre" class="form-control" value="{{ b.genre }}" required>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; font-weight:600;">ISBN</label>
+                  <input type="text" name="isbn" class="form-control" value="{{ b.isbn }}" required>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; font-weight:600;">Year</label>
+                  <input type="number" name="publication_year" class="form-control" value="{{ b.publication_year }}" required>
+                </div>
+              </div>
+              <div style="margin-bottom: 0.75rem;">
+                <label style="font-size: 0.75rem; font-weight:600;">Description</label>
+                <textarea name="description" class="form-control" rows="2" required>{{ b.description }}</textarea>
+              </div>
+              <button type="submit" class="btn btn-success btn-sm">Save Changes</button>
+              <button type="button" onclick="toggleEdit({{ b.id }})" class="btn btn-secondary btn-sm">Cancel</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function toggleEdit(id) {
+    var el = document.getElementById('edit-row-' + id);
+    el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'table-row' : 'none';
+  }
+</script>
+{% endblock %}

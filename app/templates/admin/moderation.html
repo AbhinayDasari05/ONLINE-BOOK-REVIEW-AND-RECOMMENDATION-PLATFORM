@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Review Moderation & Audit Logs - BookShield{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <h2 style="color: var(--primary);">Administrator: Content Moderation & Security Audit</h2>
+  <p style="color: var(--text-muted); font-size: 0.9rem;">Moderate inappropriate reviews and review tamper-evident security audit logs (REQ-11, COMP-08).</p>
+</div>
+
+<!-- REVIEW MODERATION SECTION -->
+<div class="card">
+  <h3>Recent Community Reviews ({{ reviews|length }})</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Book</th>
+        <th>User</th>
+        <th>Rating</th>
+        <th>Review Text</th>
+        <th>Status</th>
+        <th>Moderation Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reviews %}
+        <tr style="{% if r.is_moderated %}background-color: #fff1f2;{% endif %}">
+          <td>{{ r.id }}</td>
+          <td><strong>{{ r.book.title }}</strong></td>
+          <td>{{ r.author.username }}</td>
+          <td>★ {{ r.rating }}</td>
+          <td style="max-width: 280px; font-size: 0.85rem;">
+            {{ r.content }}
+            {% if r.is_moderated and r.moderation_reason %}
+              <div style="color: var(--danger); font-size: 0.75rem; margin-top: 0.25rem;">
+                <strong>Reason:</strong> {{ r.moderation_reason }}
+              </div>
+            {% endif %}
+          </td>
+          <td>
+            {% if r.is_moderated %}
+              <span style="color: var(--danger); font-weight: 700; font-size: 0.8rem;">HIDDEN</span>
+            {% else %}
+              <span style="color: var(--success); font-weight: 600; font-size: 0.8rem;">ACTIVE</span>
+            {% endif %}
+          </td>
+          <td>
+            <form action="{{ url_for('admin.moderate_review', review_id=r.id) }}" method="POST" style="display: flex; gap: 0.35rem; align-items: center;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              {% if not r.is_moderated %}
+                <input type="hidden" name="action" value="hide">
+                <input type="text" name="reason" placeholder="Reason (e.g. Hate speech, Spam)" class="form-control" style="font-size: 0.75rem; padding: 0.2rem 0.4rem; max-width: 140px;" required>
+                <button type="submit" class="btn btn-danger btn-sm" style="white-space: nowrap;">Hide</button>
+              {% else %}
+                <input type="hidden" name="action" value="restore">
+                <button type="submit" class="btn btn-success btn-sm" style="white-space: nowrap;">Restore</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- AUDIT TRAIL LOGS (COMP-08, CTRL-08) -->
+<div class="card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h3>Tamper-Evident Security Audit Logs (COMP-08)</h3>
+    <span style="font-size: 0.8rem; background: #f1f5f9; padding: 0.2rem 0.6rem; border-radius: 4px; color: var(--text-muted);">
+      Strict Sanitization Enforced (Zero Secrets)
+    </span>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Timestamp (UTC)</th>
+        <th>Actor</th>
+        <th>Action</th>
+        <th>Target Resource</th>
+        <th>IP Address</th>
+        <th>Status</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in audit_logs %}
+        <tr>
+          <td style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td><strong>{{ log.username or 'anonymous' }}</strong></td>
+          <td><code>{{ log.action }}</code></td>
+          <td>{{ log.resource_type }}{% if log.resource_id %}:{{ log.resource_id }}{% endif %}</td>
+          <td style="font-size: 0.8rem; font-family: monospace;">{{ log.ip_address }}</td>
+          <td>
+            {% if log.status == 'SUCCESS' %}
+              <span style="color: var(--success); font-weight: 600; font-size: 0.75rem;">SUCCESS</span>
+            {% elif log.status == 'DENIED' %}
+              <span style="color: var(--danger); font-weight: 700; font-size: 0.75rem;">DENIED</span>
+            {% else %}
+              <span style="color: var(--warning); font-weight: 600; font-size: 0.75rem;">FAILURE</span>
+            {% endif %}
+          </td>
+          <td style="font-size: 0.8rem; color: #475569; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {{ log.details or '-' }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

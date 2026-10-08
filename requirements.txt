@@ -1,0 +1,14 @@
+# Core Web Framework and Database
+Flask==3.1.3
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.1.4
+
+# Security and Authentication
+Flask-Login==0.6.3
+Flask-WTF==1.3.0
+WTForms==3.2.2
+bcrypt==5.0.0
+
+# Testing and Code Quality
+pytest==9.1.1
+bandit==1.9.4

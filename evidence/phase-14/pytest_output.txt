@@ -1,0 +1,88 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.8, pytest-9.1.1, pluggy-1.6.0 -- /Users/abhinaydasari/Documents/sse/secure-book-review-platform/venv/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/abhinaydasari/Documents/sse/secure-book-review-platform
+configfile: pytest.ini
+testpaths: tests
+collecting ... collected 23 items
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review PASSED [  4%]
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review PASSED [  8%]
+tests/test_authorization.py::test_normal_user_denied_admin_routes PASSED [ 13%]
+tests/test_authorization.py::test_admin_user_granted_admin_routes PASSED [ 17%]
+tests/test_authorization.py::test_anonymous_user_redirected_from_protected_routes PASSED [ 21%]
+tests/test_e2e_workflow.py::test_complete_end_to_end_user_journey PASSED [ 26%]
+tests/test_fuzzing.py::test_xss_payload_in_review_is_autoescaped PASSED  [ 30%]
+tests/test_fuzzing.py::test_rating_boundary_fuzzing PASSED               [ 34%]
+tests/test_fuzzing.py::test_sql_injection_search_fuzzing PASSED          [ 39%]
+tests/test_fuzzing.py::test_invalid_resource_ids PASSED                  [ 43%]
+tests/test_integration_auth.py::test_user_registration_integration PASSED [ 47%]
+tests/test_integration_auth.py::test_login_and_logout_session_invalidation PASSED [ 52%]
+tests/test_integration_reviews.py::test_full_review_lifecycle PASSED     [ 56%]
+tests/test_unit_auth.py::test_password_hashing_and_verification PASSED   [ 60%]
+tests/test_unit_auth.py::test_password_minimum_length_enforcement PASSED [ 65%]
+tests/test_unit_auth.py::test_username_validation PASSED                 [ 69%]
+tests/test_unit_auth.py::test_email_validation PASSED                    [ 73%]
+tests/test_unit_search.py::test_search_by_title_and_keyword PASSED       [ 78%]
+tests/test_unit_search.py::test_search_by_genre PASSED                   [ 82%]
+tests/test_unit_search.py::test_search_sql_injection_metacharacters PASSED [ 86%]
+tests/test_unit_validation.py::test_rating_valid_boundaries PASSED       [ 91%]
+tests/test_unit_validation.py::test_rating_invalid_boundaries PASSED     [ 95%]
+tests/test_unit_validation.py::test_text_sanitization PASSED             [100%]
+
+=============================== warnings summary ===============================
+tests/test_authorization.py: 35 warnings
+tests/test_e2e_workflow.py: 17 warnings
+tests/test_fuzzing.py: 25 warnings
+tests/test_integration_auth.py: 14 warnings
+tests/test_integration_reviews.py: 9 warnings
+tests/test_unit_auth.py: 10 warnings
+tests/test_unit_search.py: 15 warnings
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/venv/lib/python3.14/site-packages/sqlalchemy/sql/schema.py:4296: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore[call-arg, no-any-return, no-untyped-call]  # noqa: E501
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/review_service.py:21: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    return Review.query.get(review_id)
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/review_service.py:75: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    review = Review.query.get(review_id)
+
+tests/test_authorization.py: 2 warnings
+tests/test_e2e_workflow.py: 2 warnings
+tests/test_fuzzing.py: 11 warnings
+tests/test_integration_reviews.py: 2 warnings
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/book_service.py:17: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    return Book.query.get(book_id)
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/tests/test_authorization.py:42: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    persisted = Review.query.get(review_id)
+
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/review_service.py:113: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    review = Review.query.get(review_id)
+
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/tests/test_authorization.py:78: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    persisted = Review.query.get(review_id)
+
+tests/test_e2e_workflow.py::test_complete_end_to_end_user_journey
+tests/test_e2e_workflow.py::test_complete_end_to_end_user_journey
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/reading_list_service.py:25: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    book = Book.query.get(book_id)
+
+tests/test_e2e_workflow.py: 1 warning
+tests/test_fuzzing.py: 9 warnings
+tests/test_integration_reviews.py: 1 warning
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/review_service.py:35: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    book = Book.query.get(book_id)
+
+tests/test_integration_reviews.py::test_full_review_lifecycle
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/tests/test_integration_reviews.py:31: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    book_updated = Book.query.get(book_id)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+====================== 23 passed, 162 warnings in 13.07s =======================
