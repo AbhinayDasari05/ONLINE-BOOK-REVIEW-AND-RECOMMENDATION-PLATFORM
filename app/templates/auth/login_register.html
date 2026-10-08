@@ -1,76 +1,158 @@
 {% extends "base.html" %}
 
-{% block title %}Account Access - Secure Book Platform{% endblock %}
+{% block title %}{% if active_tab == 'login' %}Sign In{% else %}Create Account{% endif %} — BookShield{% endblock %}
 
 {% block content %}
-<div style="max-width: 480px; margin: 2rem auto;">
-  <div class="card">
-    <div style="display: flex; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem;">
-      <a href="{{ url_for('auth.login') }}" style="flex: 1; text-align: center; padding: 0.75rem; text-decoration: none; font-weight: 600; color: {% if active_tab == 'login' %}var(--primary){% else %}var(--text-muted){% endif %}; border-bottom: {% if active_tab == 'login' %}3px solid var(--primary){% else %}none{% endif %};">
-        Log In
-      </a>
-      <a href="{{ url_for('auth.register') }}" style="flex: 1; text-align: center; padding: 0.75rem; text-decoration: none; font-weight: 600; color: {% if active_tab == 'register' %}var(--primary){% else %}var(--text-muted){% endif %}; border-bottom: {% if active_tab == 'register' %}3px solid var(--primary){% else %}none{% endif %};">
-        Register
-      </a>
+<div style="min-height:70vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;background:linear-gradient(160deg,#f0f4ff 0%,#ede9fe 100%);">
+  <div style="width:100%;max-width:460px;">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:2rem;">
+      <div style="font-size:3.5rem;margin-bottom:.5rem;">📚</div>
+      <h1 style="font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:.35rem;">BookShield</h1>
+      <p style="color:var(--text-muted);font-size:.9rem;">{% if active_tab == 'login' %}Welcome back! Sign in to continue reading.{% else %}Join thousands of book lovers today!{% endif %}</p>
     </div>
 
-    {% if active_tab == 'login' %}
-      <!-- LOGIN FORM -->
-      <form action="{{ url_for('auth.login') }}" method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="form-group">
-          <label for="username_or_email">Username or Email</label>
-          <input type="text" id="username_or_email" name="username_or_email" class="form-control" required autocomplete="username" placeholder="e.g. alice or alice@domain.com">
-        </div>
+    <!-- Card -->
+    <div class="card" style="border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);border:none;overflow:hidden;padding:0;">
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" class="form-control" required autocomplete="current-password" placeholder="••••••••">
-        </div>
+      <!-- Tabs -->
+      <div style="display:flex;border-bottom:2px solid var(--border);">
+        <a href="{{ url_for('auth.login') }}" style="flex:1;text-align:center;padding:.95rem;text-decoration:none;font-weight:700;font-size:.95rem;transition:all .2s;
+            color:{% if active_tab == 'login' %}var(--primary){% else %}var(--text-muted){% endif %};
+            border-bottom:{% if active_tab == 'login' %}3px solid var(--primary){% else %}3px solid transparent{% endif %};
+            background:{% if active_tab == 'login' %}#f0f4ff{% else %}white{% endif %};">
+          🔐 Sign In
+        </a>
+        <a href="{{ url_for('auth.register') }}" style="flex:1;text-align:center;padding:.95rem;text-decoration:none;font-weight:700;font-size:.95rem;transition:all .2s;
+            color:{% if active_tab == 'register' %}var(--primary){% else %}var(--text-muted){% endif %};
+            border-bottom:{% if active_tab == 'register' %}3px solid var(--primary){% else %}3px solid transparent{% endif %};
+            background:{% if active_tab == 'register' %}#f0f4ff{% else %}white{% endif %};">
+          📝 Register
+        </a>
+      </div>
 
-        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
-          <input type="checkbox" id="remember" name="remember" value="1">
-          <label for="remember" style="margin-bottom: 0; font-weight: 400; font-size: 0.85rem;">Keep me logged in on this browser</label>
-        </div>
+      <div style="padding:2rem;">
+        {% if active_tab == 'login' %}
+          <!-- LOGIN FORM -->
+          <form action="{{ url_for('auth.login') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Sign In</button>
-      </form>
-      <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
-        Don't have an account? <a href="{{ url_for('auth.register') }}" style="color: var(--secondary);">Register here</a>.
-      </p>
+            <div class="form-group">
+              <label>Username or Email</label>
+              <input type="text" name="username_or_email" class="form-control" required autocomplete="username" placeholder="e.g. alice or alice@domain.com">
+            </div>
 
-    {% else %}
-      <!-- REGISTRATION FORM -->
-      <form action="{{ url_for('auth.register') }}" method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="form-group">
-          <label for="reg_username">Username</label>
-          <input type="text" id="reg_username" name="username" class="form-control" value="{{ username or '' }}" required pattern="^[a-zA-Z0-9_.-]{3,30}$" title="3-30 alphanumeric characters, hyphens or underscores" placeholder="e.g. alice">
-          <small style="color: var(--text-muted); font-size: 0.75rem;">3–30 alphanumeric chars, hyphens or underscores.</small>
-        </div>
+            <div class="form-group">
+              <label>Password</label>
+              <div style="position:relative;">
+                <input type="password" id="loginPwd" name="password" class="form-control" required autocomplete="current-password" placeholder="••••••••" style="padding-right:3rem;">
+                <button type="button" onclick="togglePwd('loginPwd',this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;opacity:.6;">👁</button>
+              </div>
+            </div>
 
-        <div class="form-group">
-          <label for="reg_email">Email Address</label>
-          <input type="email" id="reg_email" name="email" class="form-control" value="{{ email or '' }}" required placeholder="e.g. alice@platform.local">
-        </div>
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.25rem;">
+              <input type="checkbox" id="remember" name="remember" value="1" style="accent-color:var(--primary);width:16px;height:16px;">
+              <label for="remember" style="margin-bottom:0;font-weight:400;font-size:.87rem;color:var(--text-muted);cursor:pointer;">Keep me signed in</label>
+            </div>
 
-        <div class="form-group">
-          <label for="reg_password">Password</label>
-          <input type="password" id="reg_password" name="password" class="form-control" required minlength="8" placeholder="At least 8 characters">
-          <small style="color: var(--text-muted); font-size: 0.75rem;">Minimum 8 characters. Bcrypt hashed server-side.</small>
-        </div>
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">🔐 Sign In</button>
+          </form>
 
-        <div class="form-group">
-          <label for="confirm_password">Confirm Password</label>
-          <input type="password" id="confirm_password" name="confirm_password" class="form-control" required minlength="8" placeholder="Re-enter password">
-        </div>
+          <p style="margin-top:1.25rem;font-size:.87rem;color:var(--text-muted);text-align:center;">
+            New here? <a href="{{ url_for('auth.register') }}" style="color:var(--secondary);font-weight:600;">Create an account →</a>
+          </p>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Create Account</button>
-      </form>
-      <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
-        Already registered? <a href="{{ url_for('auth.login') }}" style="color: var(--secondary);">Log in here</a>.
-      </p>
-    {% endif %}
+          <!-- Security Badge -->
+          <div style="margin-top:1.25rem;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:.85rem;display:flex;align-items:center;gap:.75rem;">
+            <span style="font-size:1.5rem;">🔒</span>
+            <div style="font-size:.76rem;color:var(--text-muted);line-height:1.5;">
+              <strong style="color:var(--text-main);">Secured by BookShield</strong><br>
+              Bcrypt-hashed passwords · CSRF protection · Secure sessions
+            </div>
+          </div>
+
+        {% else %}
+          <!-- REGISTER FORM -->
+          <form action="{{ url_for('auth.register') }}" method="POST" id="regForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" name="username" class="form-control" value="{{ username or '' }}" required pattern="^[a-zA-Z0-9_.-]{3,30}$" placeholder="e.g. alice_reads" oninput="checkUser(this)">
+              <small id="userHint" style="font-size:.75rem;color:var(--text-muted);">3–30 characters, letters, numbers, _ or -</small>
+            </div>
+
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" name="email" class="form-control" value="{{ email or '' }}" required placeholder="alice@example.com">
+            </div>
+
+            <div class="form-group">
+              <label>Password <span id="pwdStrengthLabel" style="font-weight:400;font-size:.78rem;margin-left:.25rem;"></span></label>
+              <div style="position:relative;">
+                <input type="password" id="regPwd" name="password" class="form-control" required minlength="8" placeholder="At least 8 characters" oninput="checkStrength(this)" style="padding-right:3rem;">
+                <button type="button" onclick="togglePwd('regPwd',this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;opacity:.6;">👁</button>
+              </div>
+              <div id="pwdBar" style="height:4px;border-radius:2px;background:var(--border);margin-top:.4rem;transition:all .3s;"><div id="pwdFill" style="height:100%;border-radius:2px;width:0;transition:all .3s;background:var(--danger);"></div></div>
+            </div>
+
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" id="confirmPwd" name="confirm_password" class="form-control" required minlength="8" placeholder="Re-enter password" oninput="checkMatch()">
+              <small id="matchHint" style="font-size:.75rem;"></small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-top:.25rem;">📚 Create Account</button>
+          </form>
+
+          <p style="margin-top:1.25rem;font-size:.87rem;color:var(--text-muted);text-align:center;">
+            Already a member? <a href="{{ url_for('auth.login') }}" style="color:var(--secondary);font-weight:600;">Sign in →</a>
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
   </div>
 </div>
+
+<script>
+function togglePwd(id, btn) {
+  const f = document.getElementById(id);
+  f.type = f.type === 'password' ? 'text' : 'password';
+  btn.textContent = f.type === 'password' ? '👁' : '🙈';
+}
+function checkStrength(el) {
+  const v = el.value;
+  let s = 0;
+  if (v.length >= 8) s++;
+  if (/[A-Z]/.test(v)) s++;
+  if (/[0-9]/.test(v)) s++;
+  if (/[^A-Za-z0-9]/.test(v)) s++;
+  const fill = document.getElementById('pwdFill');
+  const label = document.getElementById('pwdStrengthLabel');
+  const colors = ['#dc2626','#f59e0b','#16a34a','#0284c7'];
+  const labels = ['— Weak','— Fair','— Strong','— Very Strong'];
+  const styles = ['color:#dc2626','color:#f59e0b','color:#16a34a','color:var(--secondary)'];
+  fill.style.width = (s * 25) + '%';
+  fill.style.background = colors[s-1] || '#dc2626';
+  label.textContent = labels[s-1] || '';
+  label.style.cssText = styles[s-1] || '';
+}
+function checkMatch() {
+  const p = document.getElementById('regPwd').value;
+  const c = document.getElementById('confirmPwd').value;
+  const h = document.getElementById('matchHint');
+  if (c.length === 0) { h.textContent = ''; return; }
+  h.textContent = p === c ? '✅ Passwords match' : '❌ Passwords do not match';
+  h.style.color = p === c ? 'var(--success)' : 'var(--danger)';
+}
+function checkUser(el) {
+  const h = document.getElementById('userHint');
+  const ok = /^[a-zA-Z0-9_.-]{3,30}$/.test(el.value);
+  if (el.value.length === 0) { h.textContent = '3–30 characters, letters, numbers, _ or -'; h.style.color = 'var(--text-muted)'; return; }
+  h.textContent = ok ? '✅ Username looks good!' : '❌ Invalid format';
+  h.style.color = ok ? 'var(--success)' : 'var(--danger)';
+}
+</script>
 {% endblock %}

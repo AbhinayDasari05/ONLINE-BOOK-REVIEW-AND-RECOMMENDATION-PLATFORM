@@ -1,13 +1,33 @@
-# Phase 6: UI Screens and Workflow Documentation
+# Phase 6: UI Screens and Interactive Experience Documentation
 **Course Code**: 20CYS401 | **Project**: Online Book Review and Recommendation Platform
 
 ---
 
-## 6.1 Overview of Connected UI Screens
+## 6.1 Overview of Connected UI Screens & Interactive Features
 
-The application features 6 core server-rendered screens implemented via Jinja2 templates in `app/templates/`, styled uniformly with responsive custom CSS in `app/static/css/style.css`.
+The platform features an interactive, modern user interface built using semantic HTML5, custom responsive CSS design (`app/static/css/style.css`), Jinja2 templating, and vanilla JavaScript for dynamic interactions.
 
-All forms enforce strict CSRF protection via hidden token validation (`Flask-WTF`), input sanitization on form submission, and contextual auto-escaping across all variable interpolations.
+### Key Interactive Features:
+1. **Interactive AI Assistant Widget ("BookShield AI")**:
+   - Floating action button (FAB) in the bottom-right corner with a pulse indicator.
+   - Expandable conversational chat drawer with quick suggestion chips (Thrillers, Cybersecurity, Sci-Fi, Classics, Security Info).
+   - Instant book recommendations based on genres and platform assistance.
+2. **Dynamic Live Search Suggestions**:
+   - Predictive auto-completion dropdown that activates when typing in the search bar.
+   - One-click book suggestion insertion with title, author, and category icons.
+3. **Genre Quick-Filter Chips & Stats Dashboard**:
+   - Overview metrics displaying Total Books, Total Genres, and Community Reviews.
+   - One-click genre filter pills (Cybersecurity, Sci-Fi, Fiction, etc.).
+4. **Rich Book Cards**:
+   - Distinctive gradient covers and thematic book emojis.
+   - Dynamic star rating visualizer and review count badges.
+5. **Interactive Rating & Review Form**:
+   - Interactive 5-star radio picker with dynamic sentiment labels ("Poor", "Average", "Excellent").
+   - Live character counter for review content (5–2000 characters).
+6. **Authentication Enhancements**:
+   - Live password strength indicator bar with color transitions.
+   - Real-time password confirmation match checker and username format validation.
+   - Show/hide password visibility toggle buttons.
 
 ---
 
@@ -15,12 +35,12 @@ All forms enforce strict CSRF protection via hidden token validation (`Flask-WTF
 
 ```mermaid
 graph TD
-    S1[Screen 1: Login & Register\n/login, /register]
-    S2[Screen 2: Book Catalog & Search\n/]
-    S3[Screen 3: Book Details & Reviews\n/books/{id}]
-    S4[Screen 4: Personal Reading List\n/my-shelf]
-    S5[Screen 5: Admin Catalog Management\n/admin/books]
-    S6[Screen 6: Admin Review Moderation & Audit\n/admin/moderation]
+    S1[Screen 1: Login & Register\n/login, /register\nPassword Strength & Match Checker]
+    S2[Screen 2: Book Catalog & Search\n/\nLive Search, Genre Chips, AI Assistant]
+    S3[Screen 3: Book Details & Reviews\n/books/{id}\nStar Picker, AI Recs, Shelf Widget]
+    S4[Screen 4: Personal Reading List\n/my-shelf\nInteractive Shelf Toggles]
+    S5[Screen 5: Admin Catalog Management\n/admin/books\nInline CRUD Forms]
+    S6[Screen 6: Admin Review Moderation & Audit\n/admin/moderation\nQueue & Real-time Audit Log]
 
     S1 -->|Authenticate| S2
     S2 -->|Select Book| S3
@@ -37,54 +57,45 @@ graph TD
 
 ### Screen 1: Authentication (`/login`, `/register`)
 - **Template**: `app/templates/auth/login_register.html`
-- **Associated Route**: `app/routes/auth.py`
-- **Functionality**:
-  - Combined tabbed interface for User Registration and User Login.
-  - Client and server-side validation for minimum password length (≥8 chars) and email structure.
-  - CSRF protection embedded in each independent POST form.
-  - Safe error messaging preventing user enumeration.
+- **Route**: `app/routes/auth.py`
+- **Interactions**:
+  - Live client-side password strength meter (`checkStrength()`).
+  - Password confirmation matcher (`checkMatch()`).
+  - Username alphanumeric whitelist verification (`checkUser()`).
+  - Show/hide password eye toggle buttons (`togglePwd()`).
 
 ### Screen 2: Catalog & Search (`/`)
 - **Template**: `app/templates/catalog/search.html`
-- **Associated Route**: `app/routes/catalog.py`
-- **Functionality**:
-  - Filter by keyword (Title/Author), specific Genre dropdown, or sort order.
-  - Book card grid displaying cover placeholders, average ratings (1–5 stars), and review counts.
-  - Parameterized ORM queries (`SearchService`) eliminating SQL injection risks.
+- **Route**: `app/routes/catalog.py`
+- **Interactions**:
+  - Live auto-complete suggestion box (`suggestionsList`).
+  - Genre pill selector filters.
+  - Interactive book card hover animations and direct navigation.
+  - Quick-action AI recommendation drawer trigger.
 
 ### Screen 3: Book Details, Ratings & Reviews (`/books/<int:book_id>`)
 - **Template**: `app/templates/catalog/detail.html`
-- **Associated Route**: `app/routes/catalog.py`, `app/routes/reviews.py`, `app/routes/reading_list.py`
-- **Functionality**:
-  - Complete metadata display: ISBN, publication year, author, description.
-  - Shelf selector widget: Quick-add book to "Want to Read", "Currently Reading", or "Finished".
-  - Review submission form (1–5 star radio/select, 5–2000 character review body).
-  - List of community reviews (excluding reviews hidden by moderation).
-  - Owner-exclusive Edit and Delete buttons on reviews authored by the currently logged-in user.
+- **Route**: `app/routes/catalog.py`, `app/routes/reviews.py`, `app/routes/reading_list.py`
+- **Interactions**:
+  - Hover-reactive star rating picker with qualitative label feedbacks.
+  - Real-time review text length character counter.
+  - Interactive reading status selector (`want-to-read`, `reading`, `finished`).
+  - Contextual AI recommendations based on the current book's genre.
 
 ### Screen 4: Personal Reading List (`/my-shelf`)
 - **Template**: `app/templates/reading_list/index.html`
-- **Associated Route**: `app/routes/reading_list.py`
-- **Functionality**:
-  - Grouped view of user's personal shelf items.
-  - Inline dropdown to update reading status without leaving the page.
-  - One-click removal from shelf.
-  - Filtered strictly by `current_user.id` enforcing private access boundaries.
+- **Route**: `app/routes/reading_list.py`
+- **Interactions**:
+  - Filter and review personal books with inline status update dropdown.
 
 ### Screen 5: Administrator Catalog Management (`/admin/books`)
 - **Template**: `app/templates/admin/books.html`
-- **Associated Route**: `app/routes/admin.py`
-- **Functionality**:
-  - Guarded by `@admin_required` decorator (RBAC).
-  - Form to add new books to the global catalog (Title, Author, Genre, ISBN, Description, Year).
-  - Tabular list of existing books with inline edit and delete actions.
-  - Audit logging of all catalog mutations (`BOOK_CREATED`, `BOOK_UPDATED`, `BOOK_DELETED`).
+- **Route**: `app/routes/admin.py`
+- **Interactions**:
+  - Add and delete catalog items with server-side validation.
 
 ### Screen 6: Administrator Review Moderation & Audit Logs (`/admin/moderation`)
 - **Template**: `app/templates/admin/moderation.html`
-- **Associated Route**: `app/routes/admin.py`
-- **Functionality**:
-  - Complete moderation queue showing all user reviews across all books.
-  - "Hide Review" action requiring a mandatory moderation reason (e.g., spam, abusive language).
-  - "Restore Review" action to unhide previously moderated reviews.
-  - Real-time audit log table tracking the last 50 security and administrative actions in the platform.
+- **Route**: `app/routes/admin.py`
+- **Interactions**:
+  - Hide/restore review buttons with audit trail tracking.

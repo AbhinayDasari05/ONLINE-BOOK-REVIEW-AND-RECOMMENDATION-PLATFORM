@@ -4,6 +4,7 @@ from app.services.book_service import BookService
 from app.services.search_service import SearchService
 from app.services.review_service import ReviewService
 from app.models.reading_list import ReadingListItem
+from app.models.review import Review
 
 catalog_bp = Blueprint('catalog', __name__)
 
@@ -20,8 +21,21 @@ def index():
     else:
         books = BookService.get_all_books()
 
+    all_books = BookService.get_all_books()
     genres = SearchService.get_all_genres()
-    return render_template('catalog/search.html', books=books, genres=genres, q=q, selected_genre=genre, author=author)
+    total_reviews = Review.query.count()
+
+    return render_template(
+        'catalog/search.html',
+        books=books,
+        genres=genres,
+        q=q,
+        selected_genre=genre,
+        author=author,
+        total_books=len(all_books),
+        total_reviews=total_reviews
+    )
+
 
 @catalog_bp.route('/books/<int:book_id>')
 def detail(book_id: int):

@@ -4,30 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{% block title %}Secure Book Review & Recommendation Platform{% endblock %}</title>
+  <title>{% block title %}BookShield — Secure Book Reviews{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   {% block extra_head %}{% endblock %}
 </head>
 <body>
-  <!-- Navigation Header -->
+
+  <!-- ── NAVBAR ── -->
   <nav class="navbar">
     <div class="brand">
-      <a href="{{ url_for('catalog.index') }}" style="margin-left:0; font-size:1.15rem; font-weight:700;">
-        📚 BookShield <span style="font-size:0.75rem; font-weight:400; opacity:0.8;">| 20CYS401</span>
-      </a>
+      <span>📚</span>
+      BookShield
+      <span>| 20CYS401</span>
     </div>
-    <div>
-      <a href="{{ url_for('catalog.index') }}">Browse Catalog</a>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;">
+      <a href="{{ url_for('catalog.index') }}">🔍 Browse</a>
       {% if current_user.is_authenticated %}
-        <a href="{{ url_for('reading_list.index') }}">My Shelf</a>
+        <a href="{{ url_for('reading_list.index') }}">📖 My Shelf</a>
         {% if current_user.is_admin %}
           <a href="{{ url_for('admin.books') }}"><span class="badge-admin">Admin</span> Books</a>
-          <a href="{{ url_for('admin.moderation') }}"><span class="badge-admin">Admin</span> Moderation</a>
+          <a href="{{ url_for('admin.moderation') }}"><span class="badge-admin">Admin</span> Moderate</a>
         {% endif %}
-        <span style="margin-left: 1.5rem; opacity: 0.9; font-size: 0.9rem;">
-          👤 {{ current_user.username }}
-        </span>
-        <a href="{{ url_for('auth.logout') }}" style="color: #fca5a5;">Logout</a>
+        <span class="nav-user" style="margin-left:1.25rem;">👤 {{ current_user.username }}</span>
+        <a href="{{ url_for('auth.logout') }}" style="color:#fca5a5;" data-tooltip="Logout">⏏ Exit</a>
       {% else %}
         <a href="{{ url_for('auth.login') }}">Login</a>
         <a href="{{ url_for('auth.register') }}">Register</a>
@@ -35,28 +37,216 @@
     </div>
   </nav>
 
-  <!-- Main Container -->
-  <main class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-container">
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-              <span>{{ message }}</span>
-              <button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer; font-size:1rem; opacity:0.6;">&times;</button>
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
+  <!-- ── FLASH MESSAGES ── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container" style="max-width:1180px;margin:1rem auto;padding:0 1.25rem;">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;opacity:.6;">✕</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
+  <!-- ── MAIN CONTENT ── -->
+  <main>
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Secure Footer -->
+  <!-- ── FOOTER ── -->
   <footer>
-    <p><strong>Course Code: 20CYS401 — Secure Software Engineering Laboratory</strong></p>
-    <p style="margin-top:0.25rem;">Server-Side Session Authentication • Object-Level Authorization • Tamper-Evident Audit Logging</p>
+    <p><strong>📚 BookShield</strong> — Course Code: 20CYS401 &nbsp;|&nbsp; Secure Software Engineering Laboratory</p>
+    <div class="footer-badges">
+      <span class="footer-badge">🔐 Bcrypt Auth</span>
+      <span class="footer-badge">🛡 CSRF Protected</span>
+      <span class="footer-badge">🔒 IDOR Prevented</span>
+      <span class="footer-badge">📋 Audit Logged</span>
+      <span class="footer-badge">🐳 Docker Ready</span>
+    </div>
   </footer>
+
+  <!-- ── AI ASSISTANT WIDGET ── -->
+  <button class="ai-fab" id="aiFab" aria-label="Open AI Assistant">
+    <div class="ai-pulse"></div>
+    🤖
+  </button>
+
+  <div class="ai-chat-window" id="aiWindow">
+    <div class="ai-chat-header">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-info">
+        <h4>BookShield AI</h4>
+        <p>📚 Your personal book advisor</p>
+      </div>
+      <button class="ai-close-btn" id="aiClose">✕</button>
+    </div>
+
+    <div class="ai-chat-messages" id="aiMessages">
+      <div class="ai-msg bot">
+        <div class="ai-msg-avatar">🤖</div>
+        <div class="ai-bubble">
+          👋 Hi! I'm <strong>BookShield AI</strong>, your personal reading advisor!<br><br>
+          I can help you:
+          <ul style="margin:.5rem 0 0 1rem;line-height:1.8;">
+            <li>📚 Discover books by genre</li>
+            <li>⭐ Get personalized recommendations</li>
+            <li>🔒 Explain security features</li>
+            <li>📖 Understand any book on our platform</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-chip-row" id="aiChips">
+      <button class="ai-chip" onclick="sendChip('Recommend a thriller book')">🔥 Thrillers</button>
+      <button class="ai-chip" onclick="sendChip('Best cybersecurity books')">🔐 Cybersecurity</button>
+      <button class="ai-chip" onclick="sendChip('Top sci-fi novels')">🚀 Sci-Fi</button>
+      <button class="ai-chip" onclick="sendChip('Classic fiction recommendations')">📖 Classics</button>
+      <button class="ai-chip" onclick="sendChip('How does this platform keep my reviews safe?')">❓ Security Info</button>
+    </div>
+
+    <div class="ai-chat-input-row">
+      <input class="ai-chat-input" id="aiInput" type="text" placeholder="Ask me anything about books…" autocomplete="off">
+      <button class="ai-send-btn" id="aiSend">➤</button>
+    </div>
+  </div>
+
+  <!-- ── AI LOGIC ── -->
+  <script>
+  (function() {
+    const fab = document.getElementById('aiFab');
+    const win = document.getElementById('aiWindow');
+    const closeBtn = document.getElementById('aiClose');
+    const input = document.getElementById('aiInput');
+    const sendBtn = document.getElementById('aiSend');
+    const msgs = document.getElementById('aiMessages');
+
+    fab.addEventListener('click', () => { win.classList.toggle('open'); if(win.classList.contains('open')) input.focus(); });
+    closeBtn.addEventListener('click', () => win.classList.remove('open'));
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') sendMessage(); });
+
+    window.sendChip = function(text) { input.value = text; sendMessage(); };
+
+    const knowledgeBase = {
+      thriller: { emoji:'🔥', books:['Gone Girl by Gillian Flynn','The Girl with the Dragon Tattoo by Stieg Larsson','The Da Vinci Code by Dan Brown','Sharp Objects by Gillian Flynn','Big Little Lies by Liane Moriarty'], note:'Gripping stories that keep you on the edge!' },
+      cybersecurity: { emoji:'🔐', books:['The Art of Invisibility by Kevin Mitnick','Threat Modeling by Adam Shostack','Ghost in the Wires by Kevin Mitnick','Countdown to Zero Day by Kim Zetter','Hacking: The Art of Exploitation by Jon Erickson'], note:'Essential reading for security professionals!' },
+      scifi: { emoji:'🚀', books:['Dune by Frank Herbert','The Hitchhiker\'s Guide to the Galaxy by Douglas Adams','Neuromancer by William Gibson','Ender\'s Game by Orson Scott Card','The Martian by Andy Weir'], note:'Explore the cosmos through literature!' },
+      classic: { emoji:'📚', books:['To Kill a Mockingbird by Harper Lee','1984 by George Orwell','Pride and Prejudice by Jane Austen','The Great Gatsby by F. Scott Fitzgerald','Brave New World by Aldous Huxley'], note:'Timeless stories that defined literature!' },
+      mystery: { emoji:'🕵️', books:['Murder on the Orient Express by Agatha Christie','The Hound of the Baskervilles by Arthur Conan Doyle','In the Woods by Tana French','The Secret History by Donna Tartt','Big Little Lies by Liane Moriarty'], note:'Perfect for mystery lovers!' },
+      romance: { emoji:'💕', books:['The Notebook by Nicholas Sparks','Outlander by Diana Gabaldon','Me Before You by Jojo Moyes','The Fault in Our Stars by John Green','Bridgerton by Julia Quinn'], note:'Heartwarming love stories!' },
+      fantasy: { emoji:'🧙', books:['Harry Potter by J.K. Rowling','The Lord of the Rings by J.R.R. Tolkien','A Song of Ice and Fire by George R.R. Martin','The Name of the Wind by Patrick Rothfuss','The Way of Kings by Brandon Sanderson'], note:'Epic worlds await you!' },
+      security: { emoji:'🛡', response:'This platform uses: <ul style="margin:.5rem 0 0 1rem;line-height:1.9;"><li><strong>🔐 Bcrypt (12 rounds)</strong> for password security</li><li><strong>🛡 CSRF tokens</strong> on every form</li><li><strong>✅ IDOR prevention</strong> — you can only edit your own reviews</li><li><strong>📋 Audit logging</strong> of all security events</li><li><strong>🔒 XSS protection</strong> via Jinja2 autoescaping</li><li><strong>🚫 SQL injection prevention</strong> via ORM</li></ul>' },
+      howto: { emoji:'📖', response:'Here\'s how to get started:<ol style="margin:.5rem 0 0 1rem;line-height:1.9;"><li>📝 <strong>Register</strong> for a free account</li><li>🔍 <strong>Browse</strong> the book catalog</li><li>⭐ <strong>Rate</strong> books you\'ve read (1-5 stars)</li><li>✍️ <strong>Write reviews</strong> to help others</li><li>📚 <strong>Build your shelf</strong> — track what you\'re reading</li></ol>' },
+      popular: { emoji:'🏆', books:['The Alchemist by Paulo Coelho','Atomic Habits by James Clear','Sapiens by Yuval Noah Harari','The Power of Now by Eckhart Tolle','Rich Dad Poor Dad by Robert Kiyosaki'], note:'Trending and highly-rated reads!' }
+    };
+
+    function getResponse(text) {
+      const t = text.toLowerCase();
+      if (t.includes('thriller') || t.includes('suspense'))             return format(knowledgeBase.thriller);
+      if (t.includes('cyber') || t.includes('security') || t.includes('hacking') || t.includes('infosec')) return format(knowledgeBase.cybersecurity);
+      if (t.includes('sci-fi') || t.includes('scifi') || t.includes('science fiction') || t.includes('space')) return format(knowledgeBase.scifi);
+      if (t.includes('classic') || t.includes('literature'))             return format(knowledgeBase.classic);
+      if (t.includes('mystery') || t.includes('detective') || t.includes('crime')) return format(knowledgeBase.mystery);
+      if (t.includes('romance') || t.includes('love'))                   return format(knowledgeBase.romance);
+      if (t.includes('fantasy') || t.includes('magic') || t.includes('wizard')) return format(knowledgeBase.fantasy);
+      if (t.includes('popular') || t.includes('trending') || t.includes('best')) return format(knowledgeBase.popular);
+      if (t.includes('safe') || t.includes('secure') || t.includes('protect') || t.includes('platform')) return knowledgeBase.security.emoji + ' ' + knowledgeBase.security.response;
+      if (t.includes('how') || t.includes('start') || t.includes('begin') || t.includes('use')) return knowledgeBase.howto.emoji + ' ' + knowledgeBase.howto.response;
+      if (t.includes('recommend') || t.includes('suggest'))              return format(knowledgeBase.popular);
+      if (t.includes('hello') || t.includes('hi') || t.includes('hey')) return '👋 Hello! Ask me anything — genres, book recs, or how BookShield works!';
+      if (t.includes('thank'))                                            return '😊 You\'re welcome! Happy reading! 📚';
+      return `🤔 Great question! Try asking me about:<br><br>📚 <strong>Genres</strong>: thriller, sci-fi, fantasy, romance, mystery, classics, cybersecurity<br>❓ <strong>Platform</strong>: how it works, security features<br>🔥 <strong>Trending</strong>: popular & best books`;
+    }
+
+    function format(kb) {
+      const list = kb.books.map(b => `<li>📖 ${b}</li>`).join('');
+      return `${kb.emoji} <strong>${kb.note}</strong><br><br>Top picks for you:<ul style="margin:.5rem 0 0 1rem;line-height:1.9;">${list}</ul>`;
+    }
+
+    function addMessage(text, who) {
+      const div = document.createElement('div');
+      div.className = `ai-msg ${who}`;
+      const av = document.createElement('div');
+      av.className = 'ai-msg-avatar';
+      av.textContent = who === 'bot' ? '🤖' : '👤';
+      const bubble = document.createElement('div');
+      bubble.className = 'ai-bubble';
+      bubble.innerHTML = text;
+      div.appendChild(av);
+      div.appendChild(bubble);
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+      return div;
+    }
+
+    function showTyping() {
+      const div = document.createElement('div');
+      div.className = 'ai-msg bot';
+      div.id = 'typing';
+      div.innerHTML = '<div class="ai-msg-avatar">🤖</div><div class="ai-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(text, 'user');
+      input.value = '';
+      showTyping();
+      setTimeout(() => {
+        const typing = document.getElementById('typing');
+        if (typing) typing.remove();
+        addMessage(getResponse(text), 'bot');
+      }, 900 + Math.random() * 600);
+    }
+  })();
+
+  // ── Live Search Suggestions ──
+  (function() {
+    const searchInput = document.getElementById('q');
+    if (!searchInput) return;
+    const list = document.getElementById('suggestionsList');
+    if (!list) return;
+
+    const suggestions = [
+      { title:'Threat Modeling: Designing for Security', author:'Adam Shostack', emoji:'🔐' },
+      { title:'The Art of Invisibility', author:'Kevin Mitnick', emoji:'🕵️' },
+      { title:'Clean Code', author:'Robert C. Martin', emoji:'💻' },
+      { title:'Dune', author:'Frank Herbert', emoji:'🚀' },
+      { title:'The Alchemist', author:'Paulo Coelho', emoji:'✨' },
+      { title:'1984', author:'George Orwell', emoji:'📖' },
+      { title:'Sapiens', author:'Yuval Noah Harari', emoji:'🏛' },
+      { title:'Atomic Habits', author:'James Clear', emoji:'⚡' },
+      { title:'Harry Potter', author:'J.K. Rowling', emoji:'🧙' },
+      { title:'The Da Vinci Code', author:'Dan Brown', emoji:'🎭' },
+      { title:'Gone Girl', author:'Gillian Flynn', emoji:'🔥' },
+      { title:'The Great Gatsby', author:'F. Scott Fitzgerald', emoji:'🌟' },
+    ];
+
+    searchInput.addEventListener('input', function() {
+      const q = this.value.toLowerCase().trim();
+      list.innerHTML = '';
+      if (!q || q.length < 2) { list.classList.remove('open'); return; }
+      const matches = suggestions.filter(s => s.title.toLowerCase().includes(q) || s.author.toLowerCase().includes(q));
+      if (matches.length === 0) { list.classList.remove('open'); return; }
+      matches.slice(0, 6).forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        item.innerHTML = `<span class="sug-emoji">${s.emoji}</span><div><div class="sug-title">${s.title}</div><div class="sug-author">by ${s.author}</div></div>`;
+        item.addEventListener('mousedown', () => { searchInput.value = s.title; list.classList.remove('open'); });
+        list.appendChild(item);
+      });
+      list.classList.add('open');
+    });
+
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !list.contains(e.target)) list.classList.remove('open'); });
+  })();
+  </script>
+
 </body>
 </html>

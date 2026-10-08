@@ -1,174 +1,255 @@
 {% extends "base.html" %}
 
-{% block title %}{{ book.title }} - BookShield{% endblock %}
+{% block title %}{{ book.title }} — BookShield{% endblock %}
 
 {% block content %}
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
-  <!-- Left Column: Book Details & Reviews -->
-  <div>
-    <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
-          <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 600;">
-            {{ book.genre }}
-          </span>
-          <h1 style="margin: 0.75rem 0 0.25rem 0; font-size: 1.75rem; color: var(--primary);">{{ book.title }}</h1>
-          <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 0.5rem;">
-            By <strong>{{ book.author }}</strong> &bull; Published {{ book.publication_year }} &bull; ISBN: <code>{{ book.isbn }}</code>
-          </p>
+<div class="container">
+
+  <!-- Breadcrumb -->
+  <div style="margin-bottom:1.25rem;font-size:.85rem;color:var(--text-muted);">
+    <a href="{{ url_for('catalog.index') }}" style="color:var(--primary);text-decoration:none;">📚 Catalog</a>
+    <span style="margin:0 .5rem;">›</span>
+    <span>{{ book.title }}</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:2rem;align-items:start;">
+
+    <!-- ── LEFT COLUMN ── -->
+    <div>
+      <!-- Book Info Card -->
+      <div class="card" style="border-radius:var(--radius-lg);overflow:hidden;padding:0;">
+        <!-- Cover Banner -->
+        {% set covers = ['cover-blue','cover-teal','cover-orange','cover-purple','cover-navy','cover-red','cover-green','cover-pink'] %}
+        {% set cover = covers[book.id % covers|length] %}
+        <div class="{{ cover }}" style="padding:2.5rem 2rem;display:flex;align-items:center;gap:1.5rem;">
+          <div style="font-size:5rem;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3));">
+            {% set emojis = ['📘','📗','📕','📙','📚','📒','📓','📔'] %}
+            {{ emojis[book.id % emojis|length] }}
+          </div>
+          <div style="color:white;">
+            <span style="display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:.2rem .75rem;font-size:.78rem;font-weight:600;margin-bottom:.5rem;">{{ book.genre }}</span>
+            <h1 style="font-size:1.9rem;font-weight:800;line-height:1.2;margin-bottom:.4rem;text-shadow:0 2px 8px rgba(0,0,0,.2);">{{ book.title }}</h1>
+            <p style="opacity:.9;font-size:1rem;">By <strong>{{ book.author }}</strong> · {{ book.publication_year }}</p>
+          </div>
+          <div style="margin-left:auto;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:1rem 1.5rem;text-align:center;flex-shrink:0;">
+            <div style="font-size:2.5rem;font-weight:800;color:#fef08a;line-height:1;">{{ book.average_rating }}</div>
+            <div style="color:rgba(255,255,255,.9);font-size:1.1rem;margin:.2rem 0;">{% for i in range(1,6) %}{% if i <= book.average_rating|float %}★{% else %}☆{% endif %}{% endfor %}</div>
+            <div style="color:rgba(255,255,255,.7);font-size:.75rem;">{{ book.review_count }} reviews</div>
+          </div>
         </div>
-        <div style="text-align: right; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem;">
-          <div style="font-size: 1.75rem; font-weight: 700; color: #f59e0b;">★ {{ book.average_rating }}</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted);">{{ book.review_count }} community reviews</div>
+
+        <div style="padding:1.75rem;">
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+            <span style="display:flex;align-items:center;gap:.4rem;background:#f1f5f9;padding:.4rem .85rem;border-radius:20px;font-size:.82rem;color:var(--text-muted);">
+              📅 Published {{ book.publication_year }}
+            </span>
+            <span style="display:flex;align-items:center;gap:.4rem;background:#f1f5f9;padding:.4rem .85rem;border-radius:20px;font-size:.82rem;color:var(--text-muted);">
+              🔖 ISBN: <code style="background:none;font-size:.82rem;">{{ book.isbn }}</code>
+            </span>
+            <span style="display:flex;align-items:center;gap:.4rem;background:#f1f5f9;padding:.4rem .85rem;border-radius:20px;font-size:.82rem;color:var(--text-muted);">
+              🗂 {{ book.genre }}
+            </span>
+          </div>
+
+          <h3 style="font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:.75rem;">📖 Synopsis</h3>
+          <p style="color:#334155;line-height:1.8;font-size:.97rem;">{{ book.description }}</p>
         </div>
       </div>
 
-      <h4 style="margin: 1.5rem 0 0.5rem 0;">Synopsis</h4>
-      <p style="color: #334155; line-height: 1.7; font-size: 0.95rem;">
-        {{ book.description }}
-      </p>
-    </div>
+      <!-- Reviews Card -->
+      <div class="card" style="border-radius:var(--radius-lg);">
+        <h3 style="margin-bottom:1.5rem;color:var(--primary);display:flex;align-items:center;gap:.5rem;">
+          💬 Community Reviews
+          <span style="background:var(--primary-light);color:var(--primary);border-radius:20px;padding:.15rem .65rem;font-size:.8rem;font-weight:700;">{{ book.review_count }}</span>
+        </h3>
 
-    <!-- Review Section -->
-    <div class="card">
-      <h3 style="margin-bottom: 1.25rem; color: var(--primary);">Community Reviews & Ratings</h3>
+        <!-- ── USER REVIEW INTERACTION ── -->
+        {% if current_user.is_authenticated %}
+          {% if user_review %}
+            <!-- Edit Own Review (REQ-07, CTRL-02) -->
+            <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h4 style="color:#166534;display:flex;align-items:center;gap:.4rem;">✅ Your Review</h4>
+                <form action="{{ url_for('reviews.delete_review', review_id=user_review.id) }}" method="POST" onsubmit="return confirm('Delete your review permanently?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+                </form>
+              </div>
 
-      <!-- USER REVIEW INTERACTION -->
-      {% if current_user.is_authenticated %}
-        {% if user_review %}
-          <!-- EDIT OWN REVIEW FORM (REQ-07, CTRL-02) -->
-          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 1.25rem; margin-bottom: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <h4 style="color: #166534;">Your Review (You can edit or delete this)</h4>
-              <!-- Delete Form (REQ-08, CTRL-02, CTRL-03) -->
-              <form action="{{ url_for('reviews.delete_review', review_id=user_review.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your review?');">
+              <form action="{{ url_for('reviews.edit_review', review_id=user_review.id) }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-danger btn-sm">Delete Review</button>
+                <div class="form-group">
+                  <label>Your Rating</label>
+                  <div class="star-picker" id="editStarPicker">
+                    {% for r in [5,4,3,2,1] %}
+                      <input type="radio" id="edit_star_{{ r }}" name="rating" value="{{ r }}" {% if user_review.rating == r %}checked{% endif %} required>
+                      <label for="edit_star_{{ r }}" title="{{ r }} stars">★</label>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Review Content</label>
+                  <textarea name="content" class="form-control" rows="4" required minlength="5" maxlength="2000">{{ user_review.content }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-success">💾 Update Review</button>
               </form>
             </div>
 
-            <form action="{{ url_for('reviews.edit_review', review_id=user_review.id) }}" method="POST">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <div class="form-group">
-                <label for="edit_rating">Your Rating</label>
-                <select id="edit_rating" name="rating" class="form-control" style="max-width: 160px;" required>
-                  {% for r in range(1, 6) %}
-                    <option value="{{ r }}" {% if user_review.rating == r %}selected{% endif %}>★ {{ r }} / 5</option>
-                  {% endfor %}
-                </select>
-              </div>
+          {% else %}
+            <!-- Submit New Review (REQ-05, REQ-06) -->
+            <div style="background:#f8fafc;border:2px dashed var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;transition:border-color .2s;" onmouseenter="this.style.borderColor='var(--secondary)'" onmouseleave="this.style.borderColor='var(--border)'">
+              <h4 style="margin-bottom:1rem;color:var(--primary);display:flex;align-items:center;gap:.5rem;">✍️ Leave a Review</h4>
+              <form action="{{ url_for('reviews.add_review', book_id=book.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                  <label>Your Rating</label>
+                  <div class="star-picker" id="newStarPicker">
+                    <input type="radio" id="star5" name="rating" value="5" required>
+                    <label for="star5" title="5 - Excellent">★</label>
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4" title="4 - Good">★</label>
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3" title="3 - Average">★</label>
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2" title="2 - Poor">★</label>
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1" title="1 - Terrible">★</label>
+                  </div>
+                  <div id="ratingLabel" style="font-size:.82rem;color:var(--text-muted);margin-top:.35rem;height:1em;"></div>
+                </div>
+                <div class="form-group">
+                  <label>Your Review <span id="charCount" style="font-weight:400;color:var(--text-muted);">(0 / 2000)</span></label>
+                  <textarea id="reviewContent" name="content" class="form-control" rows="5"
+                    placeholder="Share your thoughts about this book… (5–2000 characters)"
+                    required minlength="5" maxlength="2000"
+                    oninput="document.getElementById('charCount').textContent='('+this.value.length+' / 2000)'"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">📤 Submit Review</button>
+              </form>
+            </div>
+          {% endif %}
+        {% else %}
+          <div style="background:linear-gradient(135deg,var(--primary-light),#ede9fe);border:1px solid #c4b5fd;border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;">
+            <span style="font-size:2rem;">🔐</span>
+            <div>
+              <strong>Sign in to leave a review</strong>
+              <p style="font-size:.85rem;color:#5b21b6;margin-top:.2rem;">Join thousands of readers sharing their thoughts!</p>
+            </div>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm" style="margin-left:auto;flex-shrink:0;">Login →</a>
+          </div>
+        {% endif %}
 
-              <div class="form-group">
-                <label for="edit_content">Your Review</label>
-                <textarea id="edit_content" name="content" class="form-control" rows="4" required minlength="5" maxlength="2000">{{ user_review.content }}</textarea>
+        <!-- Review List -->
+        {% if reviews %}
+          <div>
+            {% for rev in reviews %}
+              <div style="padding:1.1rem 0;border-bottom:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+                  <div style="display:flex;align-items:center;gap:.6rem;">
+                    <div style="width:36px;height:36px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;color:white;font-size:.85rem;font-weight:700;flex-shrink:0;">
+                      {{ rev.author.username[0]|upper }}
+                    </div>
+                    <div>
+                      <strong style="font-size:.9rem;">{{ rev.author.username }}</strong>
+                      <div style="display:flex;align-items:center;gap:.3rem;margin-top:.1rem;">
+                        <span style="color:#f59e0b;font-size:.9rem;">
+                          {% for i in range(1,6) %}{% if i <= rev.rating %}★{% else %}☆{% endif %}{% endfor %}
+                        </span>
+                        <span style="font-size:.78rem;font-weight:600;color:#92400e;">{{ rev.rating }}/5</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span style="font-size:.75rem;color:var(--text-muted);background:#f1f5f9;padding:.2rem .6rem;border-radius:20px;">
+                    {{ rev.created_at.strftime('%b %d, %Y') }}
+                  </span>
+                </div>
+                <p style="color:#334155;font-size:.92rem;line-height:1.65;white-space:pre-wrap;margin-left:3rem;">{{ rev.content }}</p>
               </div>
-
-              <button type="submit" class="btn btn-success btn-sm">Update My Review</button>
-            </form>
+            {% endfor %}
           </div>
         {% else %}
-          <!-- SUBMIT NEW REVIEW FORM (REQ-05, REQ-06) -->
-          <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 2rem;">
-            <h4 style="margin-bottom: 0.75rem; color: var(--primary);">Leave a Review</h4>
-            <form action="{{ url_for('reviews.add_review', book_id=book.id) }}" method="POST">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <div class="form-group">
-                <label for="new_rating">Rating (1 to 5 Stars)</label>
-                <select id="new_rating" name="rating" class="form-control" style="max-width: 160px;" required>
-                  <option value="">Select Stars</option>
-                  <option value="5">★★★★★ (5 - Excellent)</option>
-                  <option value="4">★★★★☆ (4 - Good)</option>
-                  <option value="3">★★★☆☆ (3 - Average)</option>
-                  <option value="2">★★☆☆☆ (2 - Poor)</option>
-                  <option value="1">★☆☆☆☆ (1 - Terrible)</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="new_content">Review Content</label>
-                <textarea id="new_content" name="content" class="form-control" rows="4" placeholder="Write your honest review (5–2000 characters)..." required minlength="5" maxlength="2000"></textarea>
-              </div>
-
-              <button type="submit" class="btn btn-primary">Submit Review</button>
-            </form>
+          <div class="empty-state" style="padding:2rem;">
+            <div class="empty-icon" style="font-size:2.5rem;">💬</div>
+            <h3>No reviews yet</h3>
+            <p>Be the first to share your thoughts!</p>
           </div>
         {% endif %}
-      {% else %}
-        <div style="background: #f1f5f9; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
-          <p><a href="{{ url_for('auth.login') }}" style="color: var(--primary); font-weight: 600;">Sign in</a> to rate this book and post a review.</p>
-        </div>
-      {% endif %}
+      </div>
+    </div>
 
-      <!-- LIST OF REVIEWS -->
-      {% if reviews %}
-        <div>
-          {% for rev in reviews %}
-            <div style="border-bottom: 1px solid var(--border); padding: 1rem 0;">
-              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.35rem;">
-                <div>
-                  <strong style="color: var(--text-main);">{{ rev.author.username }}</strong>
-                  <span class="star-rating" style="margin-left: 0.5rem;">★ {{ rev.rating }}/5</span>
-                </div>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">
-                  {{ rev.created_at.strftime('%b %d, %Y') }}
-                </span>
-              </div>
-              <!-- Content safely escaped via Jinja2 auto-escaping (CTRL-04) -->
-              <p style="color: #334155; font-size: 0.95rem; white-space: pre-wrap;">{{ rev.content }}</p>
+    <!-- ── RIGHT COLUMN ── -->
+    <div>
+      <!-- Reading Status Widget -->
+      <div class="card" style="border-radius:var(--radius-lg);position:sticky;top:80px;">
+        <h3 style="margin-bottom:1.25rem;color:var(--primary);">📖 Reading Status</h3>
+        {% if current_user.is_authenticated %}
+          <form action="{{ url_for('reading_list.add_or_update') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="book_id" value="{{ book.id }}">
+
+            <div style="display:grid;grid-template-columns:1fr;gap:.6rem;margin-bottom:1rem;">
+              {% set statuses = [('want-to-read','📖','Want to Read','badge-want'),('reading','🔖','Currently Reading','badge-reading'),('finished','✅','Finished','badge-done')] %}
+              {% for val, emoji, label, badge in statuses %}
+                <label style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border:2px solid {% if reading_list_status == val %}var(--primary){% else %}var(--border){% endif %};border-radius:10px;cursor:pointer;transition:all .2s;background:{% if reading_list_status == val %}var(--primary-light){% else %}#f8fafc{% endif %};">
+                  <input type="radio" name="status" value="{{ val }}" {% if reading_list_status == val %}checked{% endif %} style="accent-color:var(--primary);">
+                  <span style="font-size:1.2rem;">{{ emoji }}</span>
+                  <span style="font-weight:600;font-size:.9rem;">{{ label }}</span>
+                  {% if reading_list_status == val %}<span class="shelf-badge {{ badge }}" style="margin-left:auto;">Current</span>{% endif %}
+                </label>
+              {% endfor %}
             </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p style="color: var(--text-muted); font-style: italic;">No reviews posted yet. Be the first to review this book!</p>
-      {% endif %}
-    </div>
-  </div>
 
-  <!-- Right Column: Reading List Widget & Info -->
-  <div>
-    <div class="card">
-      <h3 style="margin-bottom: 1rem; color: var(--primary);">Reading Status</h3>
-      {% if current_user.is_authenticated %}
-        <form action="{{ url_for('reading_list.add_or_update') }}" method="POST">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="book_id" value="{{ book.id }}">
-          
-          <div class="form-group">
-            <label for="shelf_status">Shelf Category</label>
-            <select id="shelf_status" name="status" class="form-control">
-              <option value="want-to-read" {% if reading_list_status == 'want-to-read' %}selected{% endif %}>📖 Want to Read</option>
-              <option value="reading" {% if reading_list_status == 'reading' %}selected{% endif %}>🔖 Currently Reading</option>
-              <option value="finished" {% if reading_list_status == 'finished' %}selected{% endif %}>✅ Finished</option>
-            </select>
+            <button type="submit" class="btn btn-primary" style="width:100%;">
+              {% if reading_list_status %}🔄 Update Shelf{% else %}➕ Add to Shelf{% endif %}
+            </button>
+          </form>
+
+          {% if reading_list_status %}
+            <p style="font-size:.8rem;color:var(--success);margin-top:.75rem;text-align:center;">
+              ✓ On your shelf as: <strong>{{ reading_list_status }}</strong>
+            </p>
+          {% endif %}
+
+        {% else %}
+          <div style="text-align:center;padding:1rem 0;">
+            <p style="font-size:.9rem;color:var(--text-muted);margin-bottom:1rem;">Log in to add this book to your personal reading shelf.</p>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="width:100%;">🔐 Sign In</a>
           </div>
-
-          <button type="submit" class="btn btn-primary" style="width: 100%;">
-            {% if reading_list_status %}Update Shelf Status{% else %}Add to My Shelf{% endif %}
-          </button>
-        </form>
-        {% if reading_list_status %}
-          <p style="font-size: 0.8rem; color: var(--success); margin-top: 0.75rem; text-align: center;">
-            ✓ Currently on your shelf: <strong>{{ reading_list_status }}</strong>
-          </p>
         {% endif %}
-      {% else %}
-        <p style="font-size: 0.85rem; color: var(--text-muted);">
-          Log in to track this book on your private reading shelf.
-        </p>
-        <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 0.5rem;">Sign In</a>
-      {% endif %}
+      </div>
+
+      <!-- Book Details Quick Card -->
+      <div class="card" style="border-radius:var(--radius-lg);background:linear-gradient(135deg,#f8fafc,#eff6ff);">
+        <h4 style="font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:1rem;">📋 Book Details</h4>
+        <table style="width:100%;font-size:.85rem;">
+          <tr><td style="color:var(--text-muted);padding:.4rem 0;">Author</td><td style="font-weight:600;">{{ book.author }}</td></tr>
+          <tr><td style="color:var(--text-muted);padding:.4rem 0;">Genre</td><td><span class="genre-tag">{{ book.genre }}</span></td></tr>
+          <tr><td style="color:var(--text-muted);padding:.4rem 0;">Year</td><td style="font-weight:600;">{{ book.publication_year }}</td></tr>
+          <tr><td style="color:var(--text-muted);padding:.4rem 0;">ISBN</td><td><code style="font-size:.8rem;background:#e2e8f0;padding:.15rem .45rem;border-radius:4px;">{{ book.isbn }}</code></td></tr>
+          <tr><td style="color:var(--text-muted);padding:.4rem 0;">Rating</td><td><span style="color:#f59e0b;font-weight:700;">★ {{ book.average_rating }}</span> <span style="color:var(--text-muted);font-size:.78rem;">({{ book.review_count }} reviews)</span></td></tr>
+        </table>
+      </div>
+
+      <!-- AI Recommendation -->
+      <div class="card" style="border-radius:var(--radius-lg);background:linear-gradient(135deg,#ede9fe,#dbeafe);border:1px solid #c4b5fd;">
+        <h4 style="color:var(--accent);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;">🤖 Want similar books?</h4>
+        <p style="font-size:.85rem;color:#5b21b6;margin-bottom:.85rem;">Ask our AI for recommendations based on this book's genre!</p>
+        <button onclick="document.getElementById('aiFab').click(); setTimeout(() => { document.getElementById('aiInput').value='Recommend books similar to {{ book.genre }} genre like {{ book.title }}'; document.getElementById('aiSend').click(); }, 300);" class="btn btn-accent btn-sm" style="width:100%;">Ask AI for More 🤖</button>
+      </div>
     </div>
 
-    <!-- Security & Integrity Box -->
-    <div class="card" style="background: #f8fafc;">
-      <h4 style="font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Security Controls</h4>
-      <ul style="font-size: 0.8rem; color: #475569; padding-left: 1.2rem; line-height: 1.6;">
-        <li>Object-level authorization prevents unauthorized edits (CTRL-02).</li>
-        <li>1 review limit per user prevents rating inflation (REQ-05).</li>
-        <li>All reviews are sanitized against stored XSS (CTRL-04).</li>
-        <li>CSRF tokens protect every state mutation (CTRL-03).</li>
-      </ul>
-    </div>
   </div>
+
+  <!-- ── AI Star Rating Script ── -->
+  <script>
+    const ratingLabels = {1:'😐 Terrible', 2:'😕 Poor', 3:'😊 Average', 4:'😃 Good', 5:'🤩 Excellent!'};
+    document.querySelectorAll('input[name="rating"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const el = document.getElementById('ratingLabel');
+        if (el) el.textContent = ratingLabels[r.value] || '';
+      });
+    });
+  </script>
+
 </div>
 {% endblock %}

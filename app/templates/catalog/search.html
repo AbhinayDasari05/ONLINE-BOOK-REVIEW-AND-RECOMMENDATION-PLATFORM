@@ -1,83 +1,166 @@
 {% extends "base.html" %}
 
-{% block title %}Book Catalog & Discovery - BookShield{% endblock %}
+{% block title %}Book Catalog & Discovery — BookShield{% endblock %}
 
 {% block content %}
-<div class="card" style="margin-bottom: 2rem;">
-  <h2 style="margin-bottom: 1rem; color: var(--primary);">Discover & Search Books</h2>
-  
-  <!-- Parameterized Search Form (REQ-03, CTRL-05) -->
-  <form action="{{ url_for('catalog.index') }}" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 120px; gap: 0.75rem; align-items: end;">
-    <div class="form-group" style="margin-bottom: 0;">
-      <label for="q">Keyword or Title</label>
-      <input type="text" id="q" name="q" class="form-control" value="{{ q or '' }}" placeholder="Search title or text...">
-    </div>
 
-    <div class="form-group" style="margin-bottom: 0;">
-      <label for="author">Author</label>
-      <input type="text" id="author" name="author" class="form-control" value="{{ author or '' }}" placeholder="e.g. Orwell, Martin...">
-    </div>
+<!-- ── HERO SECTION ── -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">📚 Discover · Review · Recommend</div>
+    <h1>Your Next Great Read<br>Starts Here</h1>
+    <p>Search thousands of books, read honest community reviews, and build your personal reading list.</p>
 
-    <div class="form-group" style="margin-bottom: 0;">
-      <label for="genre">Genre</label>
-      <select id="genre" name="genre" class="form-control">
-        <option value="">All Genres</option>
-        {% for g in genres %}
-          <option value="{{ g }}" {% if selected_genre == g %}selected{% endif %}>{{ g }}</option>
-        {% endfor %}
-      </select>
-    </div>
+    <!-- Parameterized Search Form (REQ-03, CTRL-05) -->
+    <form action="{{ url_for('catalog.index') }}" method="GET" class="hero-search-box" autocomplete="off">
+      <div>
+        <label for="q">🔍 Keyword or Title</label>
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="q" name="q" value="{{ q or '' }}" placeholder="Search by title, author, or keyword…" aria-label="Search books">
+          <div class="suggestions-list" id="suggestionsList"></div>
+        </div>
+      </div>
 
-    <div>
-      <button type="submit" class="btn btn-primary" style="width: 100%;">Filter</button>
-    </div>
-  </form>
+      <div>
+        <label for="author">✍️ Author</label>
+        <div class="search-input-wrap">
+          <span class="search-icon">✍️</span>
+          <input type="text" id="author" name="author" value="{{ author or '' }}" placeholder="e.g. Orwell, Martin…">
+        </div>
+      </div>
+
+      <div>
+        <label for="genre">🗂 Genre</label>
+        <select id="genre" name="genre">
+          <option value="">All Genres</option>
+          {% for g in genres %}
+            <option value="{{ g }}" {% if selected_genre == g %}selected{% endif %}>{{ g }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.5rem;">
+        <label style="visibility:hidden;font-size:.75rem;">Search</label>
+        <button type="submit" class="btn btn-primary btn-lg" style="white-space:nowrap;">Filter Books</button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<div>
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <h3>Available Books ({{ books|length }})</h3>
+<div class="container">
+
+  <!-- ── STATS ROW ── -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <div class="num">{{ total_books or books|length }}</div>
+      <div class="lbl">📚 Books Available</div>
+    </div>
+    <div class="stat-chip">
+      <div class="num">{{ genres|length }}</div>
+      <div class="lbl">🗂 Genres</div>
+    </div>
+    <div class="stat-chip">
+      <div class="num">{{ total_reviews or '100+' }}</div>
+      <div class="lbl">⭐ Community Reviews</div>
+    </div>
+  </div>
+
+  <!-- ── BROWSE BY GENRE ── -->
+  <div class="featured-section">
+    <h3>🗂 Browse by Genre</h3>
+    <div class="feat-chips">
+      <a href="{{ url_for('catalog.index') }}" class="feat-chip">📚 All Books</a>
+      {% for g in genres %}
+        <a href="{{ url_for('catalog.index', genre=g) }}" class="feat-chip {% if selected_genre == g %}active{% endif %}">
+          {% if g == 'Security' or g == 'Cybersecurity' %}🔐
+          {% elif g == 'Science Fiction' or g == 'Sci-Fi' %}🚀
+          {% elif g == 'Fiction' or g == 'Classic Fiction' %}📖
+          {% elif g == 'Fantasy' %}🧙
+          {% elif g == 'Mystery' or g == 'Thriller' %}🕵️
+          {% elif g == 'Romance' %}💕
+          {% elif g == 'Non-Fiction' or g == 'Biography' %}🏛
+          {% elif g == 'Self-Help' or g == 'Business' %}⚡
+          {% else %}📚{% endif %}
+          {{ g }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ── RESULTS HEADER ── -->
+  <div class="section-header">
+    <h2>
+      {% if q or selected_genre or author %}
+        🔎 Search Results
+        <span style="font-size:.95rem;font-weight:400;color:var(--text-muted);">({{ books|length }} found)</span>
+      {% else %}
+        ✨ All Books
+        <span style="font-size:.95rem;font-weight:400;color:var(--text-muted);">({{ books|length }} available)</span>
+      {% endif %}
+    </h2>
     {% if q or selected_genre or author %}
-      <a href="{{ url_for('catalog.index') }}" class="btn btn-secondary btn-sm">Clear Filters</a>
+      <a href="{{ url_for('catalog.index') }}" class="btn btn-secondary btn-sm">✕ Clear Filters</a>
     {% endif %}
   </div>
 
+  <!-- ── BOOK GRID ── -->
   {% if books %}
     <div class="grid-cards">
       {% for b in books %}
-        <div class="book-card">
-          <div>
-            <span style="font-size: 0.75rem; background: #e0f2fe; color: #0369a1; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 600;">
-              {{ b.genre }}
-            </span>
-            <h4 style="margin: 0.5rem 0 0.25rem 0;">
-              <a href="{{ url_for('catalog.detail', book_id=b.id) }}" style="color: var(--text-main); text-decoration: none;">
-                {{ b.title }}
-              </a>
-            </h4>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
-              By <strong>{{ b.author }}</strong> ({{ b.publication_year }})
-            </p>
-            <p style="font-size: 0.85rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0.75rem;">
-              {{ b.description }}
-            </p>
-          </div>
+        {% set cover_classes = ['cover-blue','cover-teal','cover-orange','cover-green','cover-purple','cover-red','cover-navy','cover-pink'] %}
+        {% set cover = cover_classes[loop.index0 % cover_classes|length] %}
+        {% set book_emojis = ['📘','📗','📕','📙','📚','📒','📓','📔'] %}
+        {% set emoji = book_emojis[loop.index0 % book_emojis|length] %}
 
-          <div style="border-top: 1px solid var(--border); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 0.85rem;">
-              <span class="star-rating">★ {{ b.average_rating }}</span>
-              <span style="color: var(--text-muted); font-size: 0.75rem;">({{ b.review_count }} reviews)</span>
+        <div class="book-card" onclick="window.location='{{ url_for('catalog.detail', book_id=b.id) }}'">
+          <div class="book-card-cover {{ cover }}">
+            <span style="font-size:3.5rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3));">{{ emoji }}</span>
+          </div>
+          <div class="book-card-body">
+            <span class="genre-tag">{{ b.genre }}</span>
+            <h4>{{ b.title }}</h4>
+            <p class="book-author">By <strong>{{ b.author }}</strong> · {{ b.publication_year }}</p>
+            <p class="book-desc">{{ b.description }}</p>
+          </div>
+          <div class="book-card-footer">
+            <div class="star-rating-display">
+              {% set r = b.average_rating|float %}
+              <span class="stars">
+                {% for i in range(1,6) %}{% if i <= r %}★{% else %}☆{% endif %}{% endfor %}
+              </span>
+              <span class="rating-val">{{ b.average_rating }}</span>
+              <span class="review-count">({{ b.review_count }})</span>
             </div>
-            <a href="{{ url_for('catalog.detail', book_id=b.id) }}" class="btn btn-secondary btn-sm">Details & Reviews</a>
+            <a href="{{ url_for('catalog.detail', book_id=b.id) }}" class="btn btn-primary btn-sm" onclick="event.stopPropagation()">View →</a>
           </div>
         </div>
       {% endfor %}
     </div>
+
   {% else %}
-    <div class="card" style="text-align: center; padding: 3rem 1rem;">
-      <p style="color: var(--text-muted); font-size: 1.1rem;">No books found matching your search criteria.</p>
-      <a href="{{ url_for('catalog.index') }}" class="btn btn-primary" style="margin-top: 1rem;">Reset Search</a>
+    <!-- Empty State -->
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No books found</h3>
+        <p style="margin-bottom:1.5rem;">No books match your search criteria. Try a different keyword or genre!</p>
+        <a href="{{ url_for('catalog.index') }}" class="btn btn-primary">🔄 Reset Search</a>
+      </div>
+    </div>
+
+    <!-- AI Recommendation Suggestion -->
+    <div class="card" style="background:linear-gradient(135deg,#ede9fe,#dbeafe);border:1px solid #c4b5fd;margin-top:1rem;">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <span style="font-size:2.5rem;">🤖</span>
+        <div>
+          <h4 style="color:var(--accent);margin-bottom:.25rem;">Ask BookShield AI for recommendations!</h4>
+          <p style="color:#5b21b6;font-size:.9rem;">Click the 🤖 button in the bottom-right corner and ask for suggestions by genre, mood, or topic.</p>
+        </div>
+        <button onclick="document.getElementById('aiFab').click()" class="btn btn-accent" style="margin-left:auto;flex-shrink:0;">Open AI 🤖</button>
+      </div>
     </div>
   {% endif %}
+
 </div>
 {% endblock %}
