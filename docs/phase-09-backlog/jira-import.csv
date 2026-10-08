@@ -1,0 +1,11 @@
+Issue Type,Issue key,Summary,Description,Priority,Status,Story Points,Sprint
+Story,BRP-1,Secure User Registration and Authentication,"Implement bcrypt-hashed passwords (rounds=12), HttpOnly cookie session management, and logout invalidation.",High,Done,5,Sprint 1
+Story,BRP-2,Book Catalog Search and Discovery,"Implement search across title, author, and genre using parameterized SQLAlchemy queries to prevent SQLi.",High,Done,5,Sprint 1
+Story,BRP-3,Book Details and Rating Aggregation,"Display book metadata and dynamically calculated average star ratings with review counters.",Medium,Done,3,Sprint 1
+Story,BRP-4,Submit Rating and Community Review,"Allow users to submit 1-5 integer ratings and sanitized text reviews with unique per-user constraint.",High,Done,5,Sprint 1
+Story,BRP-5,Edit and Delete Own Reviews (IDOR Prevention),"Enforce strict server-side object ownership verification in review_service before updating or deleting reviews.",Highest,Done,8,Sprint 2
+Story,BRP-6,Personal Reading List Management,"Provide private shelf tracking ('want-to-read', 'reading', 'finished') with ownership-isolated queries.",Medium,Done,5,Sprint 2
+Story,BRP-7,Administrator Catalog CRUD,"Role-based access control protecting book creation, update, and deletion routes using @admin_required.",High,Done,5,Sprint 2
+Story,BRP-8,Administrator Review Moderation,"Enable admins to flag and hide inappropriate reviews with mandatory reason recording.",High,Done,5,Sprint 2
+Story,BRP-9,Security Audit Logging System,"Implement tamper-evident AuditLog records with secret scrubbing to track authentication and moderation events.",High,Done,5,Sprint 2
+Story,BRP-10,Hardened Containerization and Probes,"Package application using non-root Docker user, resource limits, and /health liveness endpoint.",Medium,Done,3,Sprint 2

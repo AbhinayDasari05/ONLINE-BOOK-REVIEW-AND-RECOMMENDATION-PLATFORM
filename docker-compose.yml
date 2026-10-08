@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  book-platform:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: secure-book-review-platform
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=demo-docker-compose-secret-key-change-in-prod-xyz
+      - SESSION_COOKIE_SECURE=false
+    volumes:
+      - platform-data:/home/appuser/app/instance
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  platform-data:

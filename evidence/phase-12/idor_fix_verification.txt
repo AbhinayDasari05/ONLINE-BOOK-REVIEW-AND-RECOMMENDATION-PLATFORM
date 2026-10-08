@@ -1,0 +1,46 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.8, pytest-9.1.1, pluggy-1.6.0 -- /Users/abhinaydasari/Documents/sse/secure-book-review-platform/venv/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/abhinaydasari/Documents/sse/secure-book-review-platform
+configfile: pytest.ini
+collecting ... collected 5 items
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review PASSED [ 20%]
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review PASSED [ 40%]
+tests/test_authorization.py::test_normal_user_denied_admin_routes PASSED [ 60%]
+tests/test_authorization.py::test_admin_user_granted_admin_routes PASSED [ 80%]
+tests/test_authorization.py::test_anonymous_user_redirected_from_protected_routes PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/test_authorization.py: 35 warnings
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/venv/lib/python3.14/site-packages/sqlalchemy/sql/schema.py:4296: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore[call-arg, no-any-return, no-untyped-call]  # noqa: E501
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/review_service.py:21: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    return Review.query.get(review_id)
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/review_service.py:75: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    review = Review.query.get(review_id)
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/book_service.py:17: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    return Book.query.get(book_id)
+
+tests/test_authorization.py::test_user_b_cannot_edit_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/tests/test_authorization.py:42: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    persisted = Review.query.get(review_id)
+
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/app/services/review_service.py:113: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    review = Review.query.get(review_id)
+
+tests/test_authorization.py::test_user_b_cannot_delete_user_a_review
+  /Users/abhinaydasari/Documents/sse/secure-book-review-platform/tests/test_authorization.py:78: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    persisted = Review.query.get(review_id)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 5 passed, 43 warnings in 3.68s ========================
