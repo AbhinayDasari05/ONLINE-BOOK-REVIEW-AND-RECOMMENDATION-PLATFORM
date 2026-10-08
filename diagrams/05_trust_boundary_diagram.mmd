@@ -1,0 +1,46 @@
+graph TD
+    subgraph "External Untrusted Zone"
+        B1[Web Browser Client]
+        AT1[Threat Actor / Attacker]
+    end
+
+    subgraph "Edge & Network Perimeter"
+        SEC_HDR[Security Headers Filter: CSP, X-Frame-Options, nosniff]
+        CSRF_GATE[CSRF Token Verification Gate]
+    end
+
+    subgraph "Application Trust Boundary"
+        subgraph "Authentication & Session Tier"
+            AUTH[Flask-Login HttpOnly Cookie Validator + Bcrypt]
+        end
+        subgraph "Authorization Tier"
+            RBAC[Role-Based Access Control: @admin_required]
+            OBJ_AUTH[Object-Level Ownership Validator: review.is_owned_by]
+        end
+        subgraph "Business Services Tier"
+            SERVICES[UserService, BookService, SearchService, ReviewService]
+        end
+        subgraph "Data Access Tier"
+            ORM[SQLAlchemy ORM Parameterized Bindings]
+        end
+        subgraph "Audit Subsystem"
+            AUDIT[Tamper-Evident Audit Logger with Credential Scrubbing]
+        end
+    end
+
+    subgraph "Storage Trust Boundary"
+        DB[(Encrypted / Non-Root Local SQLite Database)]
+    end
+
+    B1 -->|HTTPS Requests| SEC_HDR
+    AT1 -.->|Attempted IDOR, SQLi, XSS| SEC_HDR
+    SEC_HDR --> CSRF_GATE
+    CSRF_GATE --> AUTH
+    AUTH --> RBAC
+    AUTH --> OBJ_AUTH
+    RBAC --> SERVICES
+    OBJ_AUTH --> SERVICES
+    SERVICES --> ORM
+    SERVICES --> AUDIT
+    ORM --> DB
+    AUDIT --> DB

@@ -1,0 +1,27 @@
+graph LR
+    subgraph "Client Environment"
+        CLIENT_BROWSER[Web Browser on Port 5050]
+    end
+
+    subgraph "Docker Container runtime UID 10001"
+        WEB_APP[Flask 3.1 Gunicorn/Werkzeug Service]
+        HEALTH_EP[Healthcheck Probe /health]
+        SQLITE_VOL[(Volume Mounted SQLite instance/)]
+    end
+
+    subgraph "Kubernetes Cluster bookplatform Namespace"
+        K8S_DEP[Deployment Replicas: 2 runAsNonRoot: true]
+        K8S_SVC[Service ClusterIP Port 80:5000]
+        K8S_CM[ConfigMap bookplatform-config]
+        K8S_SEC[Secret bookplatform-secret]
+        K8S_PROBES[Liveness & Readiness Probes /health]
+    end
+
+    CLIENT_BROWSER -->|HTTP Port 5050| WEB_APP
+    WEB_APP --> HEALTH_EP
+    WEB_APP --> SQLITE_VOL
+
+    K8S_DEP --> K8S_SVC
+    K8S_DEP --> K8S_CM
+    K8S_DEP --> K8S_SEC
+    K8S_DEP --> K8S_PROBES

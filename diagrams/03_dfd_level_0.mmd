@@ -1,0 +1,16 @@
+graph LR
+    E1((USER Actor))
+    E2((ADMINISTRATOR Actor))
+    E3((Web Browser Client))
+
+    subgraph "Online Book Review Platform [Trust Boundary]"
+        P0[Book Review Platform System Process]
+        D01[(D01: SQLite Database Instance)]
+    end
+
+    E1 -->|Search, Rate, Review, Shelf Ops| E3
+    E2 -->|Manage Catalog, Moderate, View Audits| E3
+    E3 -->|HTTPS Requests + CSRF Tokens| P0
+    P0 -->|HTML / JSON Responses + Security Headers| E3
+    P0 -->|Parameterized Queries / Read / Write| D01
+    D01 -->|Persisted Entities| P0

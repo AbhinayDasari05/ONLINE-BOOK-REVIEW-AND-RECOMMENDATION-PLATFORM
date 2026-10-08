@@ -1,0 +1,50 @@
+graph TD
+    E1((USER))
+    E2((ADMINISTRATOR))
+
+    subgraph "Secure Application Trust Boundary"
+        P01[P1: Authenticate & Session Management]
+        P02[P2: Search & Filter Books]
+        P03[P3: Book Details & Rating Aggregator]
+        P04[P4: Review Mutations & IDOR Verification]
+        P05[P5: Personal Reading Shelf Manager]
+        P06[P6: Admin Catalog & Moderation Gateway]
+        P07[P7: Tamper-Evident Audit Logging Subsystem]
+
+        D01[(D1: Users Store)]
+        D02[(D2: Books Catalog Store)]
+        D03[(D3: Reviews & Ratings Store)]
+        D04[(D4: Reading Lists Store)]
+        D05[(D5: Audit Logs Store)]
+    end
+
+    E1 -->|Credentials| P01
+    P01 -->|Signed Session Cookie| E1
+    P01 -->|Verify Bcrypt Hash| D01
+    P01 -->|Log Auth Event| P07
+
+    E1 -->|Search Terms| P02
+    P02 -->|Parameterized ORM Query| D02
+    D02 -->|Matching Books| P02
+
+    P03 -->|Render Details & Reviews| E1
+    P03 -->|Read| D02
+    P03 -->|Read| D03
+
+    E1 -->|Rating 1-5 & Review Content| P04
+    P04 -->|Verify Ownership CTRL-02| D01
+    P04 -->|Persist Review| D03
+    P04 -->|Log Review Event| P07
+
+    E1 -->|Shelf Operations| P05
+    P05 -->|Verify Ownership| D01
+    P05 -->|Update Shelf| D04
+    P05 -->|Log Shelf Event| P07
+
+    E2 -->|Admin Requests| P06
+    P06 -->|Verify @admin_required RBAC| D01
+    P06 -->|CRUD Catalog| D02
+    P06 -->|Moderate Review| D03
+    P06 -->|Log Admin Event| P07
+
+    P07 -->|Sanitized Audit Entry| D05

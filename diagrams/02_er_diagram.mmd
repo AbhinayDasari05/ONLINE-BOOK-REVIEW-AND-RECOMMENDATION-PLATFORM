@@ -1,0 +1,62 @@
+erDiagram
+    USERS {
+        int id PK
+        string username UK
+        string email UK
+        string password_hash
+        boolean is_admin
+        datetime created_at
+    }
+
+    BOOKS {
+        int id PK
+        string title
+        string author
+        string genre
+        string isbn UK
+        text description
+        int publication_year
+        datetime created_at
+    }
+
+    REVIEWS {
+        int id PK
+        int book_id FK
+        int user_id FK
+        int rating
+        text content
+        boolean is_moderated
+        string moderation_reason
+        int moderated_by FK
+        datetime created_at
+        datetime updated_at
+    }
+
+    READING_LIST_ITEMS {
+        int id PK
+        int user_id FK
+        int book_id FK
+        string status
+        datetime added_at
+        datetime updated_at
+    }
+
+    AUDIT_LOGS {
+        int id PK
+        datetime timestamp
+        int user_id FK
+        string username
+        string action
+        string resource_type
+        string resource_id
+        string ip_address
+        string status
+        text details
+    }
+
+    USERS ||--o{ REVIEWS : "authors"
+    USERS ||--o{ READING_LIST_ITEMS : "maintains"
+    USERS ||--o{ AUDIT_LOGS : "generates"
+    BOOKS ||--o{ REVIEWS : "has"
+    BOOKS ||--o{ READING_LIST_ITEMS : "included in"
+    USERS ||--o{ REVIEWS : "moderates"

@@ -1,0 +1,32 @@
+graph TD
+    ROOT[ATK-01: Unauthorized Modification of Book Review and Rating]
+
+    P1[Path 1: Insecure Direct Object Reference IDOR]
+    P2[Path 2: Cross-Site Request Forgery CSRF]
+    P3[Path 3: Account Takeover Credential Abuse]
+    P4[Path 4: Database Injection SQLi]
+
+    ROOT --> P1
+    ROOT --> P2
+    ROOT --> P3
+    ROOT --> P4
+
+    P1 --> I1[Discover Review ID of Target Author]
+    P1 --> I2[Send HTTP POST to /reviews/ID/edit]
+    P1 --> I3[Server Omits Ownership Check]
+
+    P2 --> C1[Target User Has Active Valid Session]
+    P2 --> C2[Target Visits Malicious Third-Party Page]
+    P2 --> C3[Server Accepts Request Without CSRF Token]
+
+    P3 --> A1[Credential Stuffing / Password Brute Force]
+    P3 --> A2[Session Hijacking via Stored XSS]
+
+    P4 --> S1[Find Raw String Concatenated Query]
+    P4 --> S2[Execute Arbitrary UPDATE/DELETE Statements]
+
+    classDef mitigated fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef blocked fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
+
+    class I3,C3,A1,A2,S1,S2 blocked;
+    class P1,P2,P3,P4 mitigated;

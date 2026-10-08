@@ -1,0 +1,64 @@
+graph TD
+    CLIENT[Browser Client / Web Browser]
+
+    subgraph "Presentation Layer"
+        BP_AUTH[auth.py Blueprint]
+        BP_CAT[catalog.py Blueprint]
+        BP_REV[reviews.py Blueprint]
+        BP_RL[reading_list.py Blueprint]
+        BP_ADM[admin.py Blueprint]
+        BP_HLTH[health.py Blueprint]
+        TEMPLATES[Jinja2 Server-Rendered Templates + Autoescaping]
+    end
+
+    subgraph "Security Cross-Cutting Layer"
+        SEC_COOKIES["HttpOnly & SameSite Session Cookies"]
+        CSRF_PROT["Flask-WTF Synchronizer CSRF Protection"]
+        RBAC_DEC["RBAC: @admin_required Decorator"]
+        SEC_HEADERS["Security Headers Middleware: CSP, X-Frame-Options"]
+        AUDIT_SYS["Tamper-Evident Audit Event Logger"]
+    end
+
+    subgraph "Service Layer Business Logic"
+        SRV_USER[UserService]
+        SRV_BOOK[BookService]
+        SRV_SRCH[SearchService]
+        SRV_REV[ReviewService with CTRL-02 Ownership Checks]
+        SRV_RL[ReadingListService]
+    end
+
+    subgraph "Data Access & Persistence Layer"
+        ORM_MODELS[SQLAlchemy Models: User, Book, Review, ReadingListItem, AuditLog]
+        SQLITE_DB[(SQLite Database instance/book_platform.db)]
+    end
+
+    CLIENT --> BP_AUTH
+    CLIENT --> BP_CAT
+    CLIENT --> BP_REV
+    CLIENT --> BP_RL
+    CLIENT --> BP_ADM
+    CLIENT --> BP_HLTH
+
+    BP_AUTH --> SEC_COOKIES
+    BP_ADM --> RBAC_DEC
+    BP_REV --> CSRF_PROT
+    BP_RL --> CSRF_PROT
+
+    BP_AUTH --> SRV_USER
+    BP_CAT --> SRV_SRCH
+    BP_CAT --> SRV_BOOK
+    BP_REV --> SRV_REV
+    BP_RL --> SRV_RL
+    BP_ADM --> SRV_BOOK
+    BP_ADM --> SRV_REV
+
+    SRV_USER --> ORM_MODELS
+    SRV_BOOK --> ORM_MODELS
+    SRV_SRCH --> ORM_MODELS
+    SRV_REV --> ORM_MODELS
+    SRV_RL --> ORM_MODELS
+    SRV_REV --> AUDIT_SYS
+    SRV_BOOK --> AUDIT_SYS
+
+    AUDIT_SYS --> ORM_MODELS
+    ORM_MODELS --> SQLITE_DB

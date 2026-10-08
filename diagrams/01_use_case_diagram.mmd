@@ -1,0 +1,46 @@
+graph TD
+    USER((USER))
+    ADMIN((ADMINISTRATOR))
+    ANON((Anonymous Visitor))
+
+    subgraph "Online Book Review Platform System Boundary"
+        UC01[Register Account]
+        UC02[Login / Session Auth]
+        UC03[Logout / Invalidate Session]
+        UC04[Search Books Parameterized]
+        UC05[View Book Details & Aggregated Ratings]
+        UC06[Submit Rating 1-5 Stars]
+        UC07[Write Book Review]
+        UC08[Edit Own Review CTRL-02]
+        UC09[Delete Own Review CTRL-02]
+        UC10[Maintain Reading Shelf]
+        UC11[Admin: Manage Book Catalog]
+        UC12[Admin: Moderate Reviews]
+        UC13[Admin: View Security Audit Logs]
+    end
+
+    ANON --> UC01
+    ANON --> UC02
+    ANON --> UC04
+    ANON --> UC05
+
+    USER --> UC02
+    USER --> UC03
+    USER --> UC04
+    USER --> UC05
+    USER --> UC06
+    USER --> UC07
+    USER --> UC08
+    USER --> UC09
+    USER --> UC10
+
+    ADMIN --> UC03
+    ADMIN --> UC04
+    ADMIN --> UC05
+    ADMIN --> UC11
+    ADMIN --> UC12
+    ADMIN --> UC13
+
+    UC08 -.->|extends| UC07
+    UC09 -.->|extends| UC07
+    UC12 -.->|includes| UC13
